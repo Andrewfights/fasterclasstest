@@ -12,7 +12,7 @@ export const WatchPage: React.FC = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isVideoSaved, toggleSaveVideo, updateVideoProgress, getVideoProgress, markVideoCompleted } = useLibrary();
-  const { enablePiP, disablePiP, isActive: isPiPActive } = usePiP();
+  const { enablePiP, disablePiP, isActive: isPiPActive, video: pipVideo } = usePiP();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [watchFromStart, setWatchFromStart] = useState(false);
   const currentTimeRef = useRef<number>(0);
@@ -21,14 +21,15 @@ export const WatchPage: React.FC = () => {
   const saved = videoId ? isVideoSaved(videoId) : false;
   const progress = videoId ? getVideoProgress(videoId) : undefined;
 
-  // Disable PiP when entering watch page - we want full screen player
+  // Only disable PiP if it's playing the SAME video (avoid duplicate playback)
+  // If PiP is playing a different video, let it continue
   useEffect(() => {
-    if (isPiPActive) {
+    if (isPiPActive && pipVideo?.videoId === videoId) {
       disablePiP();
     }
-    // Only run on mount
+    // Only run on mount and when videoId changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [videoId]);
 
   // Get resume time from URL query param or saved progress
   const urlResumeTime = searchParams.get('t');
@@ -140,29 +141,15 @@ export const WatchPage: React.FC = () => {
             </button>
           )}
 
-          {!isPiPActive ? (
-            <iframe
-              ref={iframeRef}
-              key={`${videoId}-${watchFromStart}`}
-              src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}`}
-              title={video.title}
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-black">
-              <div className="text-center">
-                <p className="text-white/60 mb-2">Playing in mini player</p>
-                <button
-                  onClick={disablePiP}
-                  className="px-4 py-2 bg-[#c9a227] text-black font-semibold rounded-lg"
-                >
-                  Return to Full Screen
-                </button>
-              </div>
-            </div>
-          )}
+          <iframe
+            ref={iframeRef}
+            key={`${videoId}-${watchFromStart}`}
+            src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}`}
+            title={video.title}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
         </div>
       </div>
 
