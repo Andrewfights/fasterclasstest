@@ -19,8 +19,14 @@ export const WatchPage: React.FC = () => {
   const [videoError, setVideoError] = useState(false);
   const [errorRetryCount, setErrorRetryCount] = useState(0);
   const currentTimeRef = useRef<number>(0);
+  const videoRef = useRef<typeof video>(null);
+  const isPiPActiveRef = useRef(false);
 
   const video = INITIAL_VIDEOS.find(v => v.id === videoId);
+
+  // Keep refs in sync
+  videoRef.current = video;
+  isPiPActiveRef.current = isPiPActive;
   const saved = videoId ? isVideoSaved(videoId) : false;
   const progress = videoId ? getVideoProgress(videoId) : undefined;
 
@@ -91,6 +97,25 @@ export const WatchPage: React.FC = () => {
     currentTimeRef.current = resumeTime;
   }, [resumeTime]);
 
+  // Listen for YouTube player time updates via postMessage
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.includes('youtube.com')) return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        // YouTube sends current time in info.currentTime
+        if (data.info && typeof data.info.currentTime === 'number') {
+          currentTimeRef.current = Math.floor(data.info.currentTime);
+        }
+      } catch {
+        // Not a JSON message, ignore
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
 
   // Handle watch from start
   const handleWatchFromStart = useCallback(() => {
@@ -125,22 +150,24 @@ export const WatchPage: React.FC = () => {
   useEffect(() => {
     return () => {
       // On unmount (navigation away), enable PiP if we have a video and PiP isn't already active
-      if (video && !isPiPActive) {
+      // Use refs to get current values at cleanup time
+      const currentVideo = videoRef.current;
+      if (currentVideo && !isPiPActiveRef.current) {
         enablePiP({
-          videoId: video.id,
-          embedUrl: video.embedUrl,
-          title: video.title,
-          expert: video.expert,
-          thumbnail: video.thumbnail,
-          duration: video.duration,
-          startTime: currentTimeRef.current || resumeTime,
+          videoId: currentVideo.id,
+          embedUrl: currentVideo.embedUrl,
+          title: currentVideo.title,
+          expert: currentVideo.expert,
+          thumbnail: currentVideo.thumbnail,
+          duration: currentVideo.duration,
+          startTime: currentTimeRef.current || 0,
           isLive: false,
         });
       }
     };
-    // Only run cleanup on unmount, not on every render
+    // Run cleanup only on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [video?.id]);
+  }, []);
 
   if (!video) {
     return (
@@ -220,7 +247,7 @@ export const WatchPage: React.FC = () => {
             <iframe
               ref={iframeRef}
               key={`${videoId}-${watchFromStart}-${errorRetryCount}`}
-              src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}`}
+              src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}&enablejsapi=1&origin=${window.location.origin}`}
               title={video.title}
               className="w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
