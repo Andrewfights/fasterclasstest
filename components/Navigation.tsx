@@ -56,6 +56,7 @@ const Navigation: React.FC = () => {
     { path: '/vod', label: 'VOD', icon: Play, isAccent: true },
     { path: '/courses', label: 'Courses', icon: BookOpen, matchAlso: '/course' },
     { path: '/learn', label: 'Learn', icon: GraduationCap, matchAlso: '/learn' },
+    { path: '/games', label: 'Games', icon: Gamepad2 },
   ];
 
   // Mobile bottom nav items (5 sections as requested)

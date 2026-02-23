@@ -310,9 +310,9 @@ export const LiveTVPage: React.FC = () => {
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0D0D12] pt-14">
       <div className="flex">
-        {/* Left Sidebar - Channel Categories - Hidden in theater mode */}
+        {/* Left Sidebar - Channel Categories - Hidden on mobile and in theater mode */}
         {!isTheaterMode && (
-          <div className="fixed left-0 top-14 bottom-0 z-40">
+          <div className="fixed left-0 top-14 bottom-0 z-40 hidden lg:block">
             <CategorySidebar
               categories={sidebarCategories}
               selected={selectedCategory}
@@ -323,8 +323,8 @@ export const LiveTVPage: React.FC = () => {
           </div>
         )}
 
-        {/* Main Content - Full width in theater mode */}
-        <main className={`flex-1 transition-all duration-300 ${isTheaterMode ? 'ml-0' : 'ml-56'}`}>
+        {/* Main Content - Full width on mobile and in theater mode */}
+        <main className={`flex-1 transition-all duration-300 ${isTheaterMode ? 'ml-0' : 'ml-0 lg:ml-56'}`}>
           {/* Video Player Section - Centered */}
           <div className="relative bg-black">
             <div className={`max-w-7xl mx-auto ${isTheaterMode ? '' : 'px-0 lg:px-4'}`}>
@@ -498,8 +498,91 @@ export const LiveTVPage: React.FC = () => {
             </div>
           </div>
 
-          {/* EPG Grid - Collapsed in theater mode */}
-          <div className={`border-t border-[#1E1E2E] transition-all duration-300 ${
+          {/* Mobile Category Pills - Only on mobile */}
+          <div className="lg:hidden px-4 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+            <div className="flex gap-2">
+              {LIVE_TV_CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                    selectedCategory === cat.id
+                      ? 'bg-[#F5C518] text-black'
+                      : 'bg-[#1E1E2E] text-white/70 hover:bg-[#2E2E3E]'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Channel Guide - Pluto TV Style - Only on mobile */}
+          <div className="lg:hidden border-t border-[#1E1E2E]">
+            <div className="px-4 py-2 flex items-center justify-between text-sm">
+              <span className="text-white/60">Now - {new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
+              <span className="text-[#F5C518]">Next →</span>
+            </div>
+            <div className="max-h-[40vh] overflow-y-auto">
+              {filteredChannels.map(channel => {
+                const channelSchedule = getChannelSchedule(channel, INITIAL_VIDEOS);
+                const isSelected = channel.id === currentChannel.id;
+                const timeLeft = channelSchedule ? Math.floor(channelSchedule.remaining / 60) : 0;
+
+                return (
+                  <button
+                    key={channel.id}
+                    onClick={() => switchChannel(channel)}
+                    className={`w-full flex items-center gap-3 p-3 border-b border-[#1E1E2E] transition-colors ${
+                      isSelected ? 'bg-[#F5C518]/10 border-l-2 border-l-[#F5C518]' : 'hover:bg-[#1E1E2E]'
+                    }`}
+                  >
+                    {/* Channel Logo */}
+                    <div
+                      className="w-12 h-12 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+                      style={{ backgroundColor: channel.color + '30' }}
+                    >
+                      {channel.logo}
+                    </div>
+
+                    {/* Current Program */}
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-medium truncate">
+                          {channelSchedule?.currentVideo.title || channel.name}
+                        </span>
+                        {isSelected && (
+                          <span className="px-1.5 py-0.5 bg-red-500 text-[10px] font-bold rounded">LIVE</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-white/50 text-xs">{timeLeft}m left</span>
+                        {/* Progress bar */}
+                        {channelSchedule && (
+                          <div className="flex-1 h-1 bg-[#2E2E3E] rounded-full overflow-hidden max-w-20">
+                            <div
+                              className="h-full bg-[#F5C518]"
+                              style={{
+                                width: `${((channelSchedule.currentVideo.duration - channelSchedule.remaining) / channelSchedule.currentVideo.duration) * 100}%`
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Next Program */}
+                    <div className="text-right text-xs text-white/40 flex-shrink-0 max-w-24">
+                      <div className="truncate">{channelSchedule?.nextVideo.title || 'Up next'}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* EPG Grid - Desktop only, Collapsed in theater mode */}
+          <div className={`hidden lg:block border-t border-[#1E1E2E] transition-all duration-300 ${
             isTheaterMode ? 'max-h-[20vh] overflow-hidden' : ''
           }`}>
             <EPGGrid
