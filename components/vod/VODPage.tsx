@@ -67,9 +67,9 @@ export const VODPage: React.FC = () => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 ml-56 min-h-screen">
+        <main className="flex-1 ml-56 min-h-screen overflow-hidden">
           {/* Category Header */}
-          <div className="px-8 pt-8 pb-4">
+          <div className="px-6 lg:px-8 pt-8 pb-4 max-w-7xl">
             <div className="flex items-center gap-3 mb-2">
               <span className="text-3xl">{selectedCategoryData?.icon}</span>
               <h1 className="text-3xl font-bold text-white">{selectedCategoryData?.name}</h1>
@@ -81,15 +81,18 @@ export const VODPage: React.FC = () => {
 
           {/* Hero Carousel for Featured */}
           {selectedCategory === 'featured' && (
-            <div className="mb-8">
-              <HeroCarousel
-                items={selectedVideos.slice(0, 8).map(v => ({ type: 'video', item: v }))}
-              />
+            <div className="mb-8 px-6 lg:px-8 max-w-7xl">
+              <div className="rounded-2xl overflow-hidden">
+                <HeroCarousel
+                  items={selectedVideos.slice(0, 8).map(v => ({ type: 'video', item: v }))}
+                  size="compact"
+                />
+              </div>
             </div>
           )}
 
           {/* Video Grid */}
-          <div className="px-8 pb-16">
+          <div className="px-6 lg:px-8 pb-16 max-w-7xl">
             {selectedCategory !== 'featured' ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {selectedVideos.map(video => (
@@ -103,6 +106,64 @@ export const VODPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-10">
+                {/* Continue Watching Row - only show if user has videos in progress */}
+                {continueWatching.length > 0 && (
+                  <div className="relative">
+                    <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                      <span className="text-[#F5C518]">Continue Watching</span>
+                      <span className="text-sm font-normal text-[#6B7280]">Pick up where you left off</span>
+                    </h2>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scroll-smooth"
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    >
+                      {continueWatching.slice(0, 10).map(historyItem => {
+                        const video = INITIAL_VIDEOS.find(v => v.id === historyItem.videoId);
+                        if (!video) return null;
+                        const progress = getProgressPercent(video.id, video.duration);
+                        return (
+                          <div key={video.id} className="flex-shrink-0 w-56">
+                            <button
+                              onClick={() => navigate(`/watch/${video.id}?t=${historyItem.timestamp}`)}
+                              className="group text-left w-full"
+                            >
+                              <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
+                                <img
+                                  src={video.thumbnail}
+                                  alt={video.title}
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+
+                                {/* Resume indicator */}
+                                <div className="absolute top-2 left-2 px-2 py-1 bg-[#F5C518]/90 rounded text-[10px] font-bold text-black flex items-center gap-1">
+                                  <span>Resume</span>
+                                </div>
+
+                                {/* Time left badge */}
+                                <div className="absolute bottom-8 right-2 px-2 py-1 bg-black/80 rounded text-xs font-medium text-white">
+                                  {formatDuration(Math.max(0, video.duration - historyItem.timestamp))} left
+                                </div>
+
+                                {/* Progress bar - prominent */}
+                                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#2E2E3E]">
+                                  <div
+                                    className="h-full bg-[#F5C518]"
+                                    style={{ width: `${Math.min(progress, 100)}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <h3 className="text-sm font-medium text-white line-clamp-2 group-hover:text-[#F5C518] transition-colors">
+                                {video.title}
+                              </h3>
+                              <p className="text-xs text-[#6B7280] mt-0.5">{video.expert}</p>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Most Popular Row */}
                 <ContentRowSection
                   title="Most Popular"
@@ -229,8 +290,8 @@ const ContentRowSection: React.FC<ContentRowSectionProps> = ({
 
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="flex gap-4 overflow-x-auto pb-2 scroll-smooth touch-pan-x"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         {videos.map(video => (
           <VODCard

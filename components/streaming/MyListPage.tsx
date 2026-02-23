@@ -77,7 +77,7 @@ export const MyListPage: React.FC = () => {
         {continueWatchingVideos.length > 0 && (
           <section className="mb-12">
             <div className="flex items-center gap-3 mb-6">
-              <Clock className="w-6 h-6 text-[#8B5CF6]" />
+              <Clock className="w-6 h-6 text-[#c9a227]" />
               <h2 className="text-2xl font-bold text-white">Pick Up The Grind</h2>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
@@ -91,7 +91,7 @@ export const MyListPage: React.FC = () => {
         {/* Saved Videos */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <Bookmark className="w-6 h-6 text-[#8B5CF6]" />
+            <Bookmark className="w-6 h-6 text-[#c9a227]" />
             <h2 className="text-2xl font-bold text-white">Bookmarked Plays</h2>
             <span className="text-[#6B7280]">({savedVideosList.length})</span>
           </div>
@@ -105,7 +105,7 @@ export const MyListPage: React.FC = () => {
               </p>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-3 bg-[#8B5CF6] text-white rounded-xl font-semibold hover:bg-[#7C3AED] transition-colors"
+                className="px-6 py-3 bg-[#c9a227] text-white rounded-xl font-semibold hover:bg-[#d4af37] transition-colors"
               >
                 Find Your First Play
               </button>
@@ -128,7 +128,7 @@ export const MyListPage: React.FC = () => {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#8B5CF6] text-white rounded-xl font-medium hover:bg-[#7C3AED] transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#c9a227] text-white rounded-xl font-medium hover:bg-[#d4af37] transition-colors"
             >
               <Plus className="w-4 h-4" />
               New Playlist
@@ -144,7 +144,7 @@ export const MyListPage: React.FC = () => {
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-6 py-3 bg-[#8B5CF6] text-white rounded-xl font-semibold hover:bg-[#7C3AED] transition-colors"
+                className="px-6 py-3 bg-[#c9a227] text-white rounded-xl font-semibold hover:bg-[#d4af37] transition-colors"
               >
                 Create Playlist
               </button>
@@ -197,12 +197,12 @@ export const MyListPage: React.FC = () => {
                             type="text"
                             value={editTitle}
                             onChange={(e) => setEditTitle(e.target.value)}
-                            className="flex-1 px-3 py-2 bg-[#1E1E2E] border border-[#2E2E3E] rounded-lg text-white text-sm focus:outline-none focus:border-[#8B5CF6]"
+                            className="flex-1 px-3 py-2 bg-[#1E1E2E] border border-[#2E2E3E] rounded-lg text-white text-sm focus:outline-none focus:border-[#c9a227]"
                             autoFocus
                           />
                           <button
                             onClick={handleSaveEdit}
-                            className="p-2 text-[#8B5CF6] hover:bg-[#1E1E2E] rounded-lg"
+                            className="p-2 text-[#c9a227] hover:bg-[#1E1E2E] rounded-lg"
                           >
                             Save
                           </button>
@@ -256,7 +256,7 @@ export const MyListPage: React.FC = () => {
               value={newPlaylistTitle}
               onChange={(e) => setNewPlaylistTitle(e.target.value)}
               placeholder="Playlist name"
-              className="w-full px-4 py-3 bg-[#1E1E2E] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8B5CF6] mb-6"
+              className="w-full px-4 py-3 bg-[#1E1E2E] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#c9a227] mb-6"
               autoFocus
             />
             <div className="flex gap-3">
@@ -269,7 +269,7 @@ export const MyListPage: React.FC = () => {
               <button
                 onClick={handleCreatePlaylist}
                 disabled={!newPlaylistTitle.trim()}
-                className="flex-1 px-4 py-3 bg-[#8B5CF6] text-white rounded-xl font-semibold hover:bg-[#7C3AED] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-[#c9a227] text-white rounded-xl font-semibold hover:bg-[#d4af37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Create
               </button>

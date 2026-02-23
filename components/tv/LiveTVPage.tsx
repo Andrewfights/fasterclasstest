@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Volume2, VolumeX, Maximize, Info, ArrowUp, ArrowDown, RotateCcw, Radio } from 'lucide-react';
+import { Volume2, VolumeX, Maximize, Info, ArrowUp, ArrowDown, RotateCcw, Radio, PictureInPicture2, RectangleHorizontal } from 'lucide-react';
 import { CategorySidebar, SidebarCategory } from '../shared/CategorySidebar';
 import { EPGGrid } from './EPGGrid';
 import { FastChannel, ChannelSchedule, Video } from '../../types';
 import { FAST_CHANNELS, INITIAL_VIDEOS, LIVE_TV_CATEGORIES, getYoutubeId, formatDuration } from '../../constants';
+import { usePiP } from '../../contexts/PiPContext';
 
 // Calculate which video is playing and at what offset for a channel
 const getChannelSchedule = (channel: FastChannel, videos: Video[]): ChannelSchedule | null => {
@@ -51,16 +52,94 @@ const getChannelSchedule = (channel: FastChannel, videos: Video[]): ChannelSched
   };
 };
 
+// Auto-hide delay for overlay
+const OVERLAY_HIDE_DELAY = 5000;
+
+// LocalStorage key for remembering last channel
+const LAST_CHANNEL_KEY = 'fasterclass_last_live_channel';
+
+// Get saved channel from localStorage
+const getSavedChannel = (): FastChannel => {
+  try {
+    const saved = localStorage.getItem(LAST_CHANNEL_KEY);
+    if (saved) {
+      const channel = FAST_CHANNELS.find(c => c.id === saved);
+      if (channel) return channel;
+    }
+  } catch (e) {
+    // Ignore localStorage errors
+  }
+  return FAST_CHANNELS[0];
+};
+
 export const LiveTVPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [currentChannel, setCurrentChannel] = useState<FastChannel>(FAST_CHANNELS[0]);
+  const [currentChannel, setCurrentChannel] = useState<FastChannel>(getSavedChannel);
   const [schedule, setSchedule] = useState<ChannelSchedule | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [channelSwitching, setChannelSwitching] = useState(false);
   const [isLive, setIsLive] = useState(true); // DVR state - are we watching live?
   const [dvrStartOffset, setDvrStartOffset] = useState<number | null>(null); // Custom start position
+  const [isTheaterMode, setIsTheaterMode] = useState(false); // Theater mode state
+  const [showOverlay, setShowOverlay] = useState(true); // Auto-hide overlay state
   const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { enablePiP, disablePiP, isActive: isPiPActive } = usePiP();
+
+  // Send command to YouTube player via postMessage (no reload needed)
+  const sendPlayerCommand = useCallback((command: string, args?: unknown) => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify({ event: 'command', func: command, args: args ? [args] : [] }),
+        '*'
+      );
+    }
+  }, []);
+
+  // Handle mute toggle via YouTube API (no reload)
+  const handleMuteToggle = useCallback(() => {
+    setIsMuted(prev => {
+      const newMuted = !prev;
+      sendPlayerCommand(newMuted ? 'mute' : 'unMute');
+      return newMuted;
+    });
+  }, [sendPlayerCommand]);
+
+  // Auto-hide overlay logic
+  const startHideTimer = useCallback(() => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+    }
+    hideTimeoutRef.current = setTimeout(() => {
+      setShowOverlay(false);
+    }, OVERLAY_HIDE_DELAY);
+  }, []);
+
+  const handleMouseMove = useCallback(() => {
+    setShowOverlay(true);
+    startHideTimer();
+  }, [startHideTimer]);
+
+  // Start hide timer on mount and when video changes
+  useEffect(() => {
+    startHideTimer();
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, [currentChannel, startHideTimer]);
+
+  // Show overlay on channel switch
+  useEffect(() => {
+    if (channelSwitching) {
+      setShowOverlay(true);
+      startHideTimer();
+    }
+  }, [channelSwitching, startHideTimer]);
 
   // Filter channels by category
   const filteredChannels = useMemo(() => {
@@ -120,7 +199,7 @@ export const LiveTVPage: React.FC = () => {
           break;
         case 'm':
         case 'M':
-          setIsMuted(prev => !prev);
+          handleMuteToggle();
           break;
         case 'i':
         case 'I':
@@ -129,6 +208,10 @@ export const LiveTVPage: React.FC = () => {
         case 'f':
         case 'F':
           toggleFullscreen();
+          break;
+        case 't':
+        case 'T':
+          setIsTheaterMode(prev => !prev);
           break;
         default:
           const num = parseInt(e.key);
@@ -141,7 +224,7 @@ export const LiveTVPage: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentChannel, filteredChannels]);
+  }, [currentChannel, filteredChannels, handleMuteToggle]);
 
   const switchChannel = useCallback((channel: FastChannel) => {
     if (channel.id === currentChannel.id) return;
@@ -151,6 +234,13 @@ export const LiveTVPage: React.FC = () => {
     // Reset DVR state when switching channels
     setIsLive(true);
     setDvrStartOffset(null);
+
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem(LAST_CHANNEL_KEY, channel.id);
+    } catch (e) {
+      // Ignore localStorage errors
+    }
 
     setTimeout(() => {
       setChannelSwitching(false);
@@ -184,15 +274,34 @@ export const LiveTVPage: React.FC = () => {
     }
   }, [schedule]);
 
-  // Memoize YouTube URL - only changes when video or mute state changes
+  // Enable Picture-in-Picture
+  const handleEnablePiP = useCallback(() => {
+    if (schedule && !isPiPActive) {
+      const currentVideo = schedule.currentVideo;
+      enablePiP({
+        videoId: currentVideo.id,
+        embedUrl: currentVideo.embedUrl,
+        title: currentVideo.title,
+        expert: currentVideo.expert,
+        thumbnail: currentVideo.thumbnail,
+        duration: currentVideo.duration,
+        startTime: dvrStartOffset !== null ? dvrStartOffset : Math.floor(schedule.startOffset),
+        isLive: true,
+        channelId: currentChannel.id,
+      });
+    }
+  }, [schedule, currentChannel, dvrStartOffset, enablePiP, isPiPActive]);
+
+  // Memoize YouTube URL - does NOT include mute state (controlled via API)
   // Start parameter syncs playback to the "broadcast" position
   const videoUrl = useMemo(() => {
     if (!currentVideoId || !schedule) return '';
     const videoId = getYoutubeId(schedule.currentVideo.url);
     // Use dvrStartOffset if set (restart mode), otherwise use live position
     const startTime = dvrStartOffset !== null ? dvrStartOffset : initialStartOffset;
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&start=${startTime}&mute=${isMuted ? 1 : 0}&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&enablejsapi=1`;
-  }, [currentVideoId, initialStartOffset, dvrStartOffset, isMuted, schedule?.currentVideo?.url]);
+    // Note: mute is controlled via postMessage API to avoid iframe reload
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&start=${startTime}&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&enablejsapi=1&origin=${window.location.origin}`;
+  }, [currentVideoId, initialStartOffset, dvrStartOffset, schedule?.currentVideo?.url]);
 
   const progress = schedule
     ? ((schedule.currentVideo.duration - schedule.remaining) / schedule.currentVideo.duration) * 100
@@ -201,32 +310,54 @@ export const LiveTVPage: React.FC = () => {
   return (
     <div ref={containerRef} className="min-h-screen bg-[#0D0D12] pt-14">
       <div className="flex">
-        {/* Left Sidebar - Channel Categories */}
-        <div className="fixed left-0 top-14 bottom-0 z-40">
-          <CategorySidebar
-            categories={sidebarCategories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-            title="Channels"
-            accentColor="#F5C518"
-          />
-        </div>
+        {/* Left Sidebar - Channel Categories - Hidden in theater mode */}
+        {!isTheaterMode && (
+          <div className="fixed left-0 top-14 bottom-0 z-40">
+            <CategorySidebar
+              categories={sidebarCategories}
+              selected={selectedCategory}
+              onSelect={setSelectedCategory}
+              title="Channels"
+              accentColor="#F5C518"
+            />
+          </div>
+        )}
 
-        {/* Main Content */}
-        <main className="flex-1 ml-56">
-          {/* Video Player Section */}
+        {/* Main Content - Full width in theater mode */}
+        <main className={`flex-1 transition-all duration-300 ${isTheaterMode ? 'ml-0' : 'ml-56'}`}>
+          {/* Video Player Section - Centered */}
           <div className="relative bg-black">
-            <div className="aspect-video max-h-[50vh] relative">
-              {/* Video Player */}
+            <div className={`max-w-7xl mx-auto ${isTheaterMode ? '' : 'px-0 lg:px-4'}`}>
+              <div
+                ref={playerRef}
+                className={`aspect-video relative transition-all duration-300 ${isTheaterMode ? 'max-h-[80vh]' : 'max-h-[50vh]'}`}
+                onMouseMove={handleMouseMove}
+                onMouseEnter={handleMouseMove}
+              >
+              {/* Video Player - Paused when PiP is active */}
               <div className={`absolute inset-0 transition-opacity duration-500 ${channelSwitching ? 'opacity-0' : 'opacity-100'}`}>
-                {schedule && videoUrl && (
+                {schedule && videoUrl && !isPiPActive && (
                   <iframe
+                    ref={iframeRef}
                     key={currentVideoId} // Only recreate iframe when video changes
                     src={videoUrl}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
+                )}
+                {isPiPActive && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black">
+                    <div className="text-center">
+                      <p className="text-white/60 mb-2">Playing in mini player</p>
+                      <button
+                        onClick={disablePiP}
+                        className="px-4 py-2 bg-[#c9a227] text-black font-semibold rounded-lg"
+                      >
+                        Return to Full Screen
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -241,7 +372,7 @@ export const LiveTVPage: React.FC = () => {
               )}
 
               {/* Now Playing Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4">
+              <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-4 transition-opacity duration-500 ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                 <div className="flex items-end justify-between">
                   <div className="flex items-center gap-4">
                     {/* Channel Info */}
@@ -304,11 +435,29 @@ export const LiveTVPage: React.FC = () => {
                       <Info className="w-5 h-5 text-white" />
                     </button>
                     <button
-                      onClick={() => setIsMuted(prev => !prev)}
+                      onClick={handleMuteToggle}
                       className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                       title="Mute (M)"
                     >
                       {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+                    </button>
+                    <button
+                      onClick={handleEnablePiP}
+                      className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                      title="Mini Player"
+                    >
+                      <PictureInPicture2 className="w-5 h-5 text-white" />
+                    </button>
+                    <button
+                      onClick={() => setIsTheaterMode(prev => !prev)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        isTheaterMode
+                          ? 'bg-[#c9a227] text-black'
+                          : 'bg-white/10 hover:bg-white/20'
+                      }`}
+                      title="Theater Mode (T)"
+                    >
+                      <RectangleHorizontal className={`w-5 h-5 ${isTheaterMode ? 'text-black' : 'text-white'}`} />
                     </button>
                     <button
                       onClick={toggleFullscreen}
@@ -339,16 +488,20 @@ export const LiveTVPage: React.FC = () => {
               </div>
 
               {/* Keyboard hints */}
-              <div className="absolute top-4 right-4 flex items-center gap-2 text-xs text-white/40">
+              <div className={`absolute top-4 right-4 flex items-center gap-2 text-xs text-white/40 transition-opacity duration-500 ${showOverlay ? 'opacity-100' : 'opacity-0'}`}>
                 <span className="flex items-center gap-1"><ArrowUp className="w-3 h-3" /><ArrowDown className="w-3 h-3" /> Channels</span>
                 <span>M Mute</span>
+                <span>T Theater</span>
                 <span>F Fullscreen</span>
+              </div>
               </div>
             </div>
           </div>
 
-          {/* EPG Grid */}
-          <div className="border-t border-[#1E1E2E]">
+          {/* EPG Grid - Collapsed in theater mode */}
+          <div className={`border-t border-[#1E1E2E] transition-all duration-300 ${
+            isTheaterMode ? 'max-h-[20vh] overflow-hidden' : ''
+          }`}>
             <EPGGrid
               channels={filteredChannels}
               currentChannel={currentChannel}

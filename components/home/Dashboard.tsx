@@ -15,7 +15,8 @@ import { useGamification } from '../../contexts/GamificationContext';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { gamificationService } from '../../services/gamificationService';
 import { INITIAL_VIDEOS, FAST_CHANNELS, COURSES, formatDuration } from '../../constants';
-import { FastChannel, Video } from '../../types';
+import { FastChannel, Video, HeroCarouselItem } from '../../types';
+import { HeroCarousel } from '../vod/HeroCarousel';
 
 // Get what's currently playing on a channel
 const getChannelNowPlaying = (channel: FastChannel, videos: Video[]): Video | null => {
@@ -84,17 +85,32 @@ export const Dashboard: React.FC = () => {
     return 'Time to build';
   }, []);
 
+  // Hero carousel items - mix of courses and videos
+  const heroCarouselItems: HeroCarouselItem[] = useMemo(() => [
+    { type: 'course', item: COURSES[0] },
+    { type: 'video', item: INITIAL_VIDEOS[0] },
+    { type: 'course', item: COURSES[1] },
+    { type: 'video', item: INITIAL_VIDEOS[4] },
+    { type: 'course', item: COURSES[2] },
+    { type: 'video', item: INITIAL_VIDEOS[8] },
+  ], []);
+
   return (
-    <div className="min-h-screen bg-[#0D0D12] pt-14">
+    <div className="min-h-screen bg-[#0D0D12]">
+      {/* Hero Carousel - with top padding for nav */}
+      <div className="pt-14">
+        <HeroCarousel items={heroCarouselItems} autoPlayInterval={8000} />
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Header */}
+        {/* Welcome Header - Below Carousel */}
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">
+              <h1 className="mc-heading text-2xl md:text-3xl text-white">
                 {greeting}, Founder!
               </h1>
-              <div className="flex items-center gap-4 mt-2 text-sm">
+              <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
                 <span
                   className="px-3 py-1 rounded-full font-medium"
                   style={{ backgroundColor: levelDefinition.color, color: 'white' }}
@@ -128,14 +144,14 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Continue Watching / Live Now Row */}
         <div className="grid lg:grid-cols-3 gap-6 mb-10">
-          {/* Continue Learning */}
+          {/* Continue Learning or Start Building */}
           <div className="lg:col-span-2">
             {continueVideo ? (
               <button
                 onClick={() => navigate(`/watch/${continueVideo.video.id}?t=${continueVideo.timestamp}`)}
-                className="w-full bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden hover:border-[#8B5CF6]/50 transition-all group"
+                className="w-full bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden hover:border-[#c9a227]/50 transition-all group"
               >
                 <div className="relative aspect-video">
                   <img
@@ -154,17 +170,17 @@ export const Dashboard: React.FC = () => {
 
                   {/* Info overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <p className="text-xs text-[#8B5CF6] font-semibold uppercase tracking-wide mb-1">
+                    <p className="mc-label text-[#c9a227] mb-1">
                       Pick Up The Grind
                     </p>
-                    <h3 className="text-xl font-bold text-white mb-1">{continueVideo.video.title}</h3>
+                    <h3 className="font-display text-xl font-bold text-white mb-1">{continueVideo.video.title}</h3>
                     <p className="text-sm text-white/70">{continueVideo.video.expert}</p>
                   </div>
 
                   {/* Progress bar */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/50">
                     <div
-                      className="h-full bg-[#8B5CF6]"
+                      className="h-full bg-[#c9a227]"
                       style={{ width: `${continueVideo.progress}%` }}
                     />
                   </div>
@@ -173,11 +189,11 @@ export const Dashboard: React.FC = () => {
             ) : (
               <Link
                 to="/courses"
-                className="block w-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] rounded-2xl p-8 text-center hover:opacity-90 transition-opacity"
+                className="flex flex-col items-center justify-center w-full h-full min-h-[280px] bg-gradient-to-br from-[#c9a227] to-[#a88520] rounded-2xl p-8 text-center hover:opacity-90 transition-opacity"
               >
-                <BookOpen className="w-12 h-12 text-white mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Start Building</h3>
-                <p className="text-white/80">Battle-tested playbooks from founders who've done it</p>
+                <BookOpen className="w-16 h-16 text-black mb-6" />
+                <h3 className="font-display text-2xl font-bold text-black mb-3">Start Building</h3>
+                <p className="text-black/80 text-lg max-w-md">Battle-tested playbooks from founders who've done it</p>
               </Link>
             )}
           </div>
@@ -223,7 +239,7 @@ export const Dashboard: React.FC = () => {
 
               <Link
                 to="/live"
-                className="flex items-center justify-between px-5 py-3 text-sm text-[#8B5CF6] hover:bg-[#2E2E3E]/30 transition-colors"
+                className="flex items-center justify-between px-5 py-3 text-sm text-[#c9a227] hover:bg-[#2E2E3E]/30 transition-colors"
               >
                 <span>View All Channels</span>
                 <ChevronRight className="w-4 h-4" />
@@ -262,17 +278,17 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-lg font-semibold text-white">Curated For Your Hustle</h2>
             <Link
               to="/vod"
-              className="text-sm text-[#8B5CF6] hover:text-[#A78BFA] transition-colors flex items-center gap-1"
+              className="text-sm text-[#c9a227] hover:text-[#d4af37] transition-colors flex items-center gap-1"
             >
               Explore More <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
             {recommendedVideos.map(video => (
               <button
                 key={video.id}
                 onClick={() => navigate(`/watch/${video.id}`)}
-                className="flex-shrink-0 w-48 group"
+                className="flex-shrink-0 w-36 sm:w-44 md:w-48 group"
               >
                 <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
                   <img
@@ -284,7 +300,7 @@ export const Dashboard: React.FC = () => {
                     {formatDuration(video.duration)}
                   </div>
                 </div>
-                <h3 className="text-sm font-medium text-white line-clamp-2 group-hover:text-[#8B5CF6] transition-colors">
+                <h3 className="text-xs sm:text-sm font-medium text-white line-clamp-2 group-hover:text-[#c9a227] transition-colors">
                   {video.title}
                 </h3>
                 <p className="text-xs text-[#6B7280] mt-0.5">{video.expert}</p>
@@ -299,7 +315,7 @@ export const Dashboard: React.FC = () => {
             <h2 className="text-lg font-semibold text-white">Founders Are Tuning In</h2>
             <Link
               to="/live"
-              className="text-sm text-[#8B5CF6] hover:text-[#A78BFA] transition-colors flex items-center gap-1"
+              className="text-sm text-[#c9a227] hover:text-[#d4af37] transition-colors flex items-center gap-1"
             >
               All Channels <ChevronRight className="w-4 h-4" />
             </Link>
@@ -345,27 +361,44 @@ export const Dashboard: React.FC = () => {
           </div>
         </section>
 
-        {/* Quick Game CTA */}
-        <section>
+        {/* Quick Actions Row */}
+        <section className="grid md:grid-cols-2 gap-4">
           <Link
             to="/games"
-            className="block bg-gradient-to-r from-[#8B5CF6]/20 to-[#6366F1]/20 rounded-2xl border border-[#8B5CF6]/30 p-6 hover:border-[#8B5CF6]/60 transition-all group"
+            className="bg-[#1A1A24] rounded-xl border border-[#2E2E3E] p-5 hover:border-[#c9a227]/50 transition-all group"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6366F1] flex items-center justify-center">
-                  <Gamepad2 className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white group-hover:text-[#A78BFA] transition-colors">
-                    Sharpen Your Edge
-                  </h3>
-                  <p className="text-sm text-[#9CA3AF]">
-                    Quick challenges to keep your mind sharp
-                  </p>
-                </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a227] to-[#a88520] flex items-center justify-center flex-shrink-0">
+                <Gamepad2 className="w-6 h-6 text-black" />
               </div>
-              <ChevronRight className="w-6 h-6 text-[#9CA3AF] group-hover:text-white transition-colors" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-semibold text-white group-hover:text-[#c9a227] transition-colors">
+                  Sharpen Your Edge
+                </h3>
+                <p className="text-sm text-[#6B7280]">
+                  Quick challenges to test your knowledge
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280] group-hover:text-white transition-colors flex-shrink-0" />
+            </div>
+          </Link>
+          <Link
+            to="/learn"
+            className="bg-[#1A1A24] rounded-xl border border-[#2E2E3E] p-5 hover:border-[#c9a227]/50 transition-all group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-semibold text-white group-hover:text-[#c9a227] transition-colors">
+                  Flashcards & Quizzes
+                </h3>
+                <p className="text-sm text-[#6B7280]">
+                  Reinforce key startup concepts
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280] group-hover:text-white transition-colors flex-shrink-0" />
             </div>
           </Link>
         </section>

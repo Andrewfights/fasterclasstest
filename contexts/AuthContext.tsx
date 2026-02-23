@@ -5,6 +5,7 @@ import { authService } from '../services/authService';
 interface AuthContextType {
   authState: AuthState;
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string }>;
+  signup: (email: string, password: string, displayName: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -34,13 +35,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return result;
   };
 
+  const signup = async (email: string, password: string, displayName: string) => {
+    const result = await authService.signup(email, password, displayName);
+    if (result.success) {
+      setAuthState(authService.getAuthState());
+    }
+    return result;
+  };
+
   const logout = () => {
     authService.logout();
     setAuthState({ isAuthenticated: false, user: null, lastLoginTime: null });
   };
 
   return (
-    <AuthContext.Provider value={{ authState, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ authState, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Gamepad2, Trophy, Clock, Target, Zap, BookOpen, TrendingUp, Lock, DollarSign, Scale, Mic, Flame } from 'lucide-react';
+import { Gamepad2, Trophy, Clock, Target, Zap, BookOpen, TrendingUp, Lock, DollarSign, Scale, Mic, Flame, Briefcase, Users, Lightbulb, BarChart3, Rocket, Building2 } from 'lucide-react';
 import { TerminologySprint } from './TerminologySprint';
 import { MetricMatch } from './MetricMatch';
 import { ValuationGuesstimate } from './ValuationGuesstimate';
 import { FoundersDilemma } from './FoundersDilemma';
 import { PitchTank } from './PitchTank';
 import { BurnRateBlitz } from './BurnRateBlitz';
+import { DealNegotiator } from './DealNegotiator';
 
 // Placeholder leaderboard data
 const LEADERBOARD = [
@@ -23,7 +24,7 @@ const GAMES = [
     title: 'Terminology Sprint',
     description: 'Match startup terms to definitions as fast as you can',
     icon: BookOpen,
-    color: '#8B5CF6',
+    color: '#c9a227',
     category: 'quick',
     duration: '1 min',
     available: true,
@@ -53,7 +54,7 @@ const GAMES = [
     title: "Founder's Dilemma",
     description: 'Make tough decisions in realistic startup scenarios',
     icon: Scale,
-    color: '#8B5CF6',
+    color: '#c9a227',
     category: 'challenge',
     duration: '5 min',
     available: true,
@@ -78,11 +79,55 @@ const GAMES = [
     duration: '3 min',
     available: true,
   },
+  {
+    id: 'deal-negotiator',
+    title: 'Deal Negotiator',
+    description: 'Shark Tank style - negotiate funding terms with VCs',
+    icon: Briefcase,
+    color: '#3B82F6',
+    category: 'challenge',
+    duration: '8 min',
+    available: true,
+  },
+  {
+    id: 'team-builder',
+    title: 'Team Builder',
+    description: 'Hire and manage your founding team wisely',
+    icon: Users,
+    color: '#8B5CF6',
+    category: 'challenge',
+    duration: '5 min',
+    available: true,
+  },
+  {
+    id: 'market-analyzer',
+    title: 'Market Analyzer',
+    description: 'Analyze TAM, SAM, SOM for startup ideas',
+    icon: BarChart3,
+    color: '#14B8A6',
+    category: 'quick',
+    duration: '2 min',
+    available: true,
+  },
+  {
+    id: 'product-pivot',
+    title: 'Product Pivot',
+    description: 'Know when to pivot vs persevere with your idea',
+    icon: Rocket,
+    color: '#EC4899',
+    category: 'challenge',
+    duration: '5 min',
+    available: true,
+  },
 ];
 
 const COMING_SOON = [
   { title: 'Talk to Users', description: 'User interview simulator' },
   { title: 'Cap Table Crunch', description: 'Equity dilution calculator' },
+  { title: 'Competitor Analysis', description: 'Find weaknesses in competitors' },
+  { title: 'Investor Pitch', description: 'Practice your 60 second pitch' },
+  { title: 'Growth Hacker', description: 'Choose the right growth channels' },
+  { title: 'Legal Landmines', description: 'Navigate startup legal issues' },
 ];
 
 // Game component map
@@ -93,6 +138,7 @@ const GAME_COMPONENTS: Record<string, React.FC> = {
   'founders-dilemma': FoundersDilemma,
   'pitch-tank': PitchTank,
   'burn-rate-blitz': BurnRateBlitz,
+  'deal-negotiator': DealNegotiator,
 };
 
 export const GamesPage: React.FC = () => {
@@ -116,8 +162,8 @@ export const GamesPage: React.FC = () => {
       <div className="min-h-screen bg-[#0D0D12] pt-14">
         <div className="max-w-2xl mx-auto px-6 py-8 text-center">
           <div className="bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] p-8">
-            <div className="w-20 h-20 rounded-2xl bg-[#8B5CF6]/20 flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-10 h-10 text-[#8B5CF6]" />
+            <div className="w-20 h-20 rounded-2xl bg-[#c9a227]/20 flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-10 h-10 text-[#c9a227]" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-3">
               {game?.title || 'Game'} Coming Soon
@@ -127,7 +173,7 @@ export const GamesPage: React.FC = () => {
             </p>
             <button
               onClick={() => navigate('/games')}
-              className="px-6 py-3 bg-[#8B5CF6] text-white font-semibold rounded-xl hover:bg-[#7C3AED] transition-colors"
+              className="px-6 py-3 bg-[#c9a227] text-white font-semibold rounded-xl hover:bg-[#d4af37] transition-colors"
             >
               Back to Challenges
             </button>
@@ -145,7 +191,7 @@ export const GamesPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6366F1] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a227] to-[#a88520] flex items-center justify-center">
             <Gamepad2 className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -160,7 +206,7 @@ export const GamesPage: React.FC = () => {
             {/* Quick Games */}
             <section>
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#8B5CF6]" />
+                <Clock className="w-5 h-5 text-[#c9a227]" />
                 Quick Drills
               </h2>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -170,7 +216,7 @@ export const GamesPage: React.FC = () => {
                     <button
                       key={game.id}
                       onClick={() => navigate(`/games/${game.id}`)}
-                      className="p-5 bg-[#1A1A24] rounded-xl border border-[#2E2E3E] hover:border-[#8B5CF6]/50 transition-all text-left group"
+                      className="p-5 bg-[#1A1A24] rounded-xl border border-[#2E2E3E] hover:border-[#c9a227]/50 transition-all text-left group"
                     >
                       <div className="flex items-start gap-4">
                         <div
@@ -180,7 +226,7 @@ export const GamesPage: React.FC = () => {
                           <Icon className="w-6 h-6" style={{ color: game.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-white group-hover:text-[#8B5CF6] transition-colors">
+                          <h3 className="font-semibold text-white group-hover:text-[#c9a227] transition-colors">
                             {game.title}
                           </h3>
                           <p className="text-sm text-[#9CA3AF] mt-1 line-clamp-2">
@@ -297,7 +343,7 @@ export const GamesPage: React.FC = () => {
                 </div>
                 <div className="px-5 py-3 border-t border-[#2E2E3E] bg-[#0D0D12]/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#8B5CF6] flex items-center justify-center text-sm font-bold text-white">
+                    <div className="w-8 h-8 rounded-full bg-[#c9a227] flex items-center justify-center text-sm font-bold text-white">
                       15
                     </div>
                     <div className="flex-1">
@@ -315,7 +361,7 @@ export const GamesPage: React.FC = () => {
                 <h3 className="font-semibold text-white mb-4">Your Stats</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-2xl font-bold text-[#8B5CF6]">12</p>
+                    <p className="text-2xl font-bold text-[#c9a227]">12</p>
                     <p className="text-xs text-[#6B7280]">Challenges Crushed</p>
                   </div>
                   <div>

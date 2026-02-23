@@ -5,3 +5,4 @@ export { ValuationGuesstimate } from './ValuationGuesstimate';
 export { FoundersDilemma } from './FoundersDilemma';
 export { PitchTank } from './PitchTank';
 export { BurnRateBlitz } from './BurnRateBlitz';
+export { DealNegotiator } from './DealNegotiator';

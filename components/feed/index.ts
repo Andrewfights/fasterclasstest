@@ -1,0 +1,1 @@
+export { VerticalFeed } from './VerticalFeed';

@@ -122,7 +122,7 @@ export const SearchPage: React.FC = () => {
         thumbnail: c.coverImage,
         subtitle: c.instructor || c.topic,
         badge: 'COURSE',
-        badgeColor: '#8B5CF6',
+        badgeColor: '#c9a227',
       });
     });
 
@@ -214,7 +214,7 @@ export const SearchPage: React.FC = () => {
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search sessions, playbooks, live drops..."
-            className="w-full pl-12 pr-12 py-4 bg-[#1A1A24] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8B5CF6] transition-colors"
+            className="w-full pl-12 pr-12 py-4 bg-[#1A1A24] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#c9a227] transition-colors"
           />
           {query && (
             <button
@@ -229,7 +229,7 @@ export const SearchPage: React.FC = () => {
         {/* Search Pills */}
         <div className="flex flex-wrap gap-2 mb-8">
           {query && (
-            <span className="px-3 py-1.5 bg-[#8B5CF6]/20 text-[#8B5CF6] rounded-full text-sm font-medium border border-[#8B5CF6]/40">
+            <span className="px-3 py-1.5 bg-[#c9a227]/20 text-[#c9a227] rounded-full text-sm font-medium border border-[#c9a227]/40">
               "{query}"
             </span>
           )}

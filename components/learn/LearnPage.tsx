@@ -43,7 +43,7 @@ export const LearnPage: React.FC = () => {
       title: 'Flashcards',
       description: 'Master startup terminology with spaced repetition',
       icon: BookOpen,
-      color: '#8B5CF6',
+      color: '#c9a227',
       stats: stats.flashcards,
       path: '/learn/flashcards',
     },
@@ -76,7 +76,7 @@ export const LearnPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#3B82F6] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a227] to-[#a88520] flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -95,7 +95,7 @@ export const LearnPage: React.FC = () => {
               <button
                 key={exercise.id}
                 onClick={() => navigate(exercise.path)}
-                className="p-5 bg-[#1A1A24] rounded-xl border border-[#2E2E3E] hover:border-[#8B5CF6]/50 transition-all text-left group"
+                className="p-5 bg-[#1A1A24] rounded-xl border border-[#2E2E3E] hover:border-[#c9a227]/50 transition-all text-left group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div
@@ -107,7 +107,7 @@ export const LearnPage: React.FC = () => {
                   <ChevronRight className="w-5 h-5 text-[#6B7280] group-hover:text-white transition-colors" />
                 </div>
 
-                <h3 className="font-semibold text-white mb-1 group-hover:text-[#8B5CF6] transition-colors">
+                <h3 className="font-semibold text-white mb-1 group-hover:text-[#c9a227] transition-colors">
                   {exercise.title}
                 </h3>
                 <p className="text-sm text-[#9CA3AF] mb-4">
@@ -169,10 +169,10 @@ export const LearnPage: React.FC = () => {
         </div>
 
         {/* Quick Tips */}
-        <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-[#3B82F6]/10 rounded-xl border border-[#8B5CF6]/20 p-6">
+        <div className="bg-gradient-to-r from-[#c9a227]/10 to-[#a88520]/10 rounded-xl border border-[#c9a227]/20 p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 rounded-lg bg-[#8B5CF6]/20 flex items-center justify-center flex-shrink-0">
-              <Zap className="w-5 h-5 text-[#8B5CF6]" />
+            <div className="w-10 h-10 rounded-lg bg-[#c9a227]/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-5 h-5 text-[#c9a227]" />
             </div>
             <div>
               <h3 className="font-semibold text-white mb-1">Pro Tips</h3>

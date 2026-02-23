@@ -20,7 +20,7 @@ export const CourseDetailPage: React.FC = () => {
           <h2 className="text-2xl font-bold text-white mb-4">Playbook not found</h2>
           <button
             onClick={() => navigate('/courses')}
-            className="px-6 py-3 bg-[#8B5CF6] text-white rounded-xl font-semibold"
+            className="px-6 py-3 bg-[#c9a227] text-white rounded-xl font-semibold"
           >
             View All Playbooks
           </button>
@@ -100,7 +100,7 @@ export const CourseDetailPage: React.FC = () => {
                 <span>{formatDuration(totalDuration)} total</span>
               </div>
               {watchedCount > 0 && (
-                <div className="flex items-center gap-2 text-[#8B5CF6]">
+                <div className="flex items-center gap-2 text-[#c9a227]">
                   <Check className="w-5 h-5" />
                   <span>{watchedCount}/{videos.length} crushed</span>
                 </div>
@@ -112,7 +112,7 @@ export const CourseDetailPage: React.FC = () => {
               <div className="w-full max-w-md mb-6">
                 <div className="h-2 bg-[#1E1E2E] rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] rounded-full"
+                    className="h-full bg-gradient-to-r from-[#a88520] to-[#c9a227] rounded-full"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -162,7 +162,7 @@ export const CourseDetailPage: React.FC = () => {
                     </div>
                     {isWatched && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-[#8B5CF6] flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-[#c9a227] flex items-center justify-center">
                           <Check className="w-5 h-5 text-white" />
                         </div>
                       </div>
@@ -173,7 +173,7 @@ export const CourseDetailPage: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[#6B7280] text-sm">{index + 1}.</span>
-                      <h3 className="text-white font-medium truncate group-hover:text-[#8B5CF6] transition-colors">
+                      <h3 className="text-white font-medium truncate group-hover:text-[#c9a227] transition-colors">
                         {video.title}
                       </h3>
                     </div>
@@ -192,7 +192,7 @@ export const CourseDetailPage: React.FC = () => {
                     }}
                     className={`p-2 rounded-lg transition-colors ${
                       saved
-                        ? 'bg-[#8B5CF6] text-white'
+                        ? 'bg-[#c9a227] text-white'
                         : 'bg-[#1E1E2E] text-[#6B7280] hover:text-white'
                     }`}
                   >

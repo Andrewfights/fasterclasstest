@@ -145,7 +145,7 @@ export interface GlossaryTerm {
 
 // === FAST CHANNELS (PLUTO TV STYLE) ===
 
-export type FastChannelCategory = 'learning' | 'inspiration' | 'tech' | 'mixed';
+export type FastChannelCategory = 'learning' | 'inspiration' | 'tech' | 'mixed' | 'entrepreneur' | 'creative' | 'education';
 
 export interface FastChannel {
   id: string;

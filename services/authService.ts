@@ -1,39 +1,48 @@
 import { AuthState, LoginCredentials, AdminUser } from '../types';
 
-// Admin credentials (password stored as SHA-256 hash)
-const ADMIN_EMAIL = 'andrew@ruffcut.ai';
-// SHA-256 hash of "Yankees48!"
-const ADMIN_PASSWORD_HASH = 'a8f5f167f44f4964e6c998dee827110c44b2f4f2f9c0c2b5e7a6e7d8c9b0a1b2';
+// Demo users for testing (in production, this would be a backend)
+interface DemoUser {
+  email: string;
+  password: string;
+  displayName: string;
+  isAdmin?: boolean;
+}
+
+const DEMO_USERS: DemoUser[] = [
+  { email: 'andrew@ruffcut.ai', password: 'Yankees48!', displayName: 'Andrew', isAdmin: true },
+  { email: 'demo@fasterclass.com', password: 'demo123', displayName: 'Demo User' },
+  { email: 'founder@startup.com', password: 'founder', displayName: 'Startup Founder' },
+];
 
 const AUTH_STORAGE_KEY = 'fasterclass_auth';
+const DEMO_USERS_KEY = 'fasterclass_demo_users';
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-// Hash password using SHA-256
-const hashPassword = async (password: string): Promise<string> => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+// Get all users (built-in + any registered demo users)
+const getAllUsers = (): DemoUser[] => {
+  try {
+    const stored = localStorage.getItem(DEMO_USERS_KEY);
+    const registeredUsers: DemoUser[] = stored ? JSON.parse(stored) : [];
+    return [...DEMO_USERS, ...registeredUsers];
+  } catch {
+    return DEMO_USERS;
+  }
 };
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
     const { email, password } = credentials;
+    const allUsers = getAllUsers();
 
-    // Validate email (case-insensitive)
-    if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    // Find user by email (case-insensitive)
+    const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
       return { success: false, error: 'Invalid email or password' };
     }
 
-    // Validate password
-    const passwordHash = await hashPassword(password);
-
-    // For demo purposes, also accept plain text comparison
-    // In production, only use hash comparison
-    const isValidPassword = password === 'Yankees48!' || passwordHash === ADMIN_PASSWORD_HASH;
-
-    if (!isValidPassword) {
+    // Validate password (simple comparison for demo)
+    if (password !== user.password) {
       return { success: false, error: 'Invalid email or password' };
     }
 
@@ -41,8 +50,47 @@ export const authService = {
     const authState: AuthState = {
       isAuthenticated: true,
       user: {
-        email: ADMIN_EMAIL,
-        displayName: 'Andrew'
+        email: user.email,
+        displayName: user.displayName
+      },
+      lastLoginTime: Date.now()
+    };
+
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authState));
+    return { success: true };
+  },
+
+  // Sign up new demo user
+  async signup(email: string, password: string, displayName: string): Promise<{ success: boolean; error?: string }> {
+    const allUsers = getAllUsers();
+
+    // Check if email already exists
+    if (allUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+      return { success: false, error: 'Email already registered' };
+    }
+
+    // Validate inputs
+    if (!email || !password || !displayName) {
+      return { success: false, error: 'All fields are required' };
+    }
+
+    if (password.length < 4) {
+      return { success: false, error: 'Password must be at least 4 characters' };
+    }
+
+    // Add new user to registered users
+    const newUser: DemoUser = { email, password, displayName };
+    const stored = localStorage.getItem(DEMO_USERS_KEY);
+    const registeredUsers: DemoUser[] = stored ? JSON.parse(stored) : [];
+    registeredUsers.push(newUser);
+    localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(registeredUsers));
+
+    // Auto-login after signup
+    const authState: AuthState = {
+      isAuthenticated: true,
+      user: {
+        email: newUser.email,
+        displayName: newUser.displayName
       },
       lastLoginTime: Date.now()
     };

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fasterclass | Signal, Not Noise</title>
 
-    <!-- Google Fonts - Manrope for premium typography -->
+    <!-- Google Fonts - Playfair Display for headlines, DM Sans for body -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -17,9 +17,14 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Manrope', 'system-ui', 'sans-serif'],
+              sans: ['DM Sans', 'system-ui', 'sans-serif'],
+              serif: ['Playfair Display', 'Georgia', 'serif'],
             },
             colors: {
+              // Masterclass-inspired gold
+              'mc-gold': '#c9a227',
+              'mc-gold-light': '#d4af37',
+              'mc-gold-dark': '#a88520',
               // Premium color palette
               'premium-bg': '#0A0F18',
               'premium-surface': '#111827',
@@ -233,6 +238,46 @@
       /* Premium transition defaults */
       * {
         transition-timing-function: var(--ease-premium);
+      }
+
+      /* Masterclass-style typography */
+      .font-display {
+        font-family: 'Playfair Display', Georgia, serif;
+      }
+
+      .mc-heading {
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .mc-label {
+        font-family: 'DM Sans', system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+
+      /* Auto-scrolling marquee animation */
+      @keyframes marquee-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+
+      .animate-marquee {
+        animation: marquee-scroll 30s linear infinite;
+      }
+
+      .animate-marquee:hover {
+        animation-play-state: paused;
+      }
+
+      /* Fade mask for marquee edges */
+      .mask-fade-edges {
+        mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(90deg, transparent, black 10%, black 90%, transparent);
       }
 
       /* Theme transition for smooth switching */

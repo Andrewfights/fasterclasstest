@@ -9,6 +9,8 @@ import LoginPage from './components/LoginPage';
 import { useAuth } from './contexts/AuthContext';
 import { LibraryProvider } from './contexts/LibraryContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { PiPProvider } from './contexts/PiPContext';
+import { PiPPlayer } from './components/PiPPlayer';
 import { dataService } from './services/dataService';
 
 // Streaming components
@@ -39,6 +41,9 @@ import { LearnPage, FlashcardPage, QuizPage, QuizPlayer, FillBlankPage } from '.
 
 // Home Dashboard
 import { Dashboard } from './components/home';
+
+// Landing Page
+import { LandingPage } from './components/landing/LandingPage';
 
 // CMS Components
 import {
@@ -132,11 +137,27 @@ const ProtectedCMSLayout: React.FC = () => {
 };
 
 function App() {
-  const { isLoading } = useAuth();
+  const { isLoading, authState } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
+  const [loginMode, setLoginMode] = useState<'signin' | 'signup'>('signin');
 
   // Initialize state from localStorage
   const [videos, setVideos] = useState<Video[]>(() => dataService.getVideos());
   const [playlists, setPlaylists] = useState<Playlist[]>(() => dataService.getPlaylists());
+
+  const handleSignIn = () => {
+    setLoginMode('signin');
+    setShowLogin(true);
+  };
+
+  const handleGetStarted = () => {
+    setLoginMode('signup');
+    setShowLogin(true);
+  };
+
+  const handleLoginSuccess = () => {
+    setShowLogin(false);
+  };
 
   // Persist videos when they change
   useEffect(() => {
@@ -164,9 +185,36 @@ function App() {
     );
   }
 
+  // Show login page if requested
+  if (showLogin) {
+    return (
+      <ThemeProvider>
+        <LibraryProvider>
+          <LoginPage
+            onLoginSuccess={handleLoginSuccess}
+            onBack={() => setShowLogin(false)}
+            initialMode={loginMode}
+          />
+        </LibraryProvider>
+      </ThemeProvider>
+    );
+  }
+
+  // Show landing page if not authenticated
+  if (!authState.isAuthenticated) {
+    return (
+      <ThemeProvider>
+        <LibraryProvider>
+          <LandingPage onSignIn={handleSignIn} onGetStarted={handleGetStarted} />
+        </LibraryProvider>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider>
       <LibraryProvider>
+        <PiPProvider>
         <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] font-sans">
         <Routes>
           {/* Full-screen player route - no navigation bar */}
@@ -257,7 +305,10 @@ function App() {
             </>
           } />
         </Routes>
+        {/* PiP Player - persists across routes */}
+        <PiPPlayer />
       </div>
+        </PiPProvider>
       </LibraryProvider>
     </ThemeProvider>
   );
