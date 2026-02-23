@@ -1,4 +1,7 @@
-import { Playlist, Video, Channel, Course, CourseModule, GlossaryTerm, FastChannel, LevelDefinition, Achievement } from './types';
+import { Playlist, Video, Channel, Course, CourseModule, GlossaryTerm, FastChannel, LevelDefinition, Achievement, Episode } from './types';
+
+// Episodes (for CMS - initially empty, managed via CMS)
+export const EPISODES: Episode[] = [];
 
 export const INITIAL_VIDEOS: Video[] = [
   // ============================================

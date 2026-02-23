@@ -506,3 +506,96 @@ export interface HeroCarouselCourseItem {
 }
 
 export type HeroCarouselItem = HeroCarouselVideoItem | HeroCarouselCourseItem;
+
+// === FOUNDER JOURNEY TYPES ===
+
+export type FounderStage = 'idea' | 'preseed' | 'seed' | 'seriesA' | 'seriesB' | 'scale' | 'exit';
+export type IndustryType = 'saas' | 'consumer' | 'marketplace' | 'fintech' | 'healthtech' | 'other';
+
+export interface FounderJourney {
+  companyName: string;
+  companyDescription: string;
+  industry: IndustryType;
+  stage: FounderStage;
+  cashBalance: number;           // Virtual cash from funding
+  valuation: number;             // Company valuation
+  teamSize: number;              // Virtual team members
+  productScore: number;          // 0-100 product strength
+  mrr: number;                   // Monthly recurring revenue
+  weekNumber: number;            // Simulated weeks in business
+  createdAt: number;
+  lastPlayedAt: number;
+}
+
+// Daily Missions (Duolingo-style)
+export type MissionType = 'watch_video' | 'complete_quiz' | 'play_game' | 'finish_module' | 'homework' | 'flashcards';
+
+export interface DailyMission {
+  id: string;
+  type: MissionType;
+  title: string;
+  description: string;
+  xpReward: number;
+  cashReward?: number;           // Virtual company cash
+  completed: boolean;
+  target?: number;               // e.g., watch 3 videos
+  progress?: number;             // Current progress toward target
+}
+
+// Journey Milestones
+export interface JourneyMilestone {
+  id: string;
+  stage: FounderStage;
+  title: string;
+  description: string;
+  requirements: MilestoneRequirement[];
+  rewards: {
+    xp: number;
+    cash: number;
+    valuationBoost: number;
+    badge?: string;
+    teamUnlock?: number;
+  };
+}
+
+export interface MilestoneRequirement {
+  type: 'course' | 'module' | 'game' | 'homework' | 'xp' | 'videos';
+  id?: string;                   // Specific course/module/game ID
+  count?: number;                // For generic requirements
+  description: string;           // Human-readable requirement
+}
+
+// Game State for save/resume
+export interface GameSessionState {
+  gameType: string;              // e.g., 'flashcards', 'scenario', 'term-match'
+  sessionId: string;
+  startedAt: number;
+  lastPlayedAt: number;
+  isPaused: boolean;
+  currentRound?: number;
+  totalRounds?: number;
+  score?: number;
+  data?: Record<string, unknown>; // Game-specific state
+}
+
+// Stage definitions with metadata
+export interface StageDefinition {
+  stage: FounderStage;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  minValuation: number;
+  maxValuation: number;
+}
+
+// Leaderboard entry
+export interface LeaderboardEntry {
+  rank: number;
+  displayName: string;
+  companyName: string;
+  valuation: number;
+  xp: number;
+  stage: FounderStage;
+  weeklyXP: number;
+}

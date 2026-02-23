@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Play,
@@ -9,8 +9,8 @@ import {
   BookOpen,
   Trophy,
   PlayCircle,
-  Gamepad2,
   Smartphone,
+  Rocket,
 } from 'lucide-react';
 import { useGamification } from '../../contexts/GamificationContext';
 import { useLibrary } from '../../contexts/LibraryContext';
@@ -19,6 +19,14 @@ import { INITIAL_VIDEOS, FAST_CHANNELS, COURSES, formatDuration } from '../../co
 import { filterValidVideos } from '../../services/videoValidationService';
 import { FastChannel, Video, HeroCarouselItem } from '../../types';
 import { HeroCarousel } from '../vod/HeroCarousel';
+
+// New dashboard components
+import { FounderHQ } from '../dashboard/FounderHQ';
+import { DailyMissions } from '../dashboard/DailyMissions';
+import { ContinueJourney } from '../dashboard/ContinueJourney';
+import { MilestoneCard } from '../dashboard/MilestoneCard';
+import { GameCenter } from '../dashboard/GameCenter';
+import { CreateCompanyModal } from '../modals/CreateCompanyModal';
 
 // Get what's currently playing on a channel
 const getChannelNowPlaying = (channel: FastChannel, videos: Video[]): Video | null => {
@@ -44,13 +52,32 @@ const getChannelNowPlaying = (channel: FastChannel, videos: Video[]): Video | nu
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { level, levelDefinition, xpProgress, progress } = useGamification();
-  const { continueWatching, savedVideos, getVideoProgress } = useLibrary();
+  const {
+    level,
+    levelDefinition,
+    xpProgress,
+    progress,
+    founderJourney,
+    dailyMissions,
+    currentMilestone,
+    gameSessions,
+    hasCompany,
+    createCompany,
+  } = useGamification();
+  const { continueWatching, savedVideos, getVideoProgress, watchHistory } = useLibrary();
   const stats = gamificationService.getStats();
+
+  // Modal state
+  const [showCreateCompany, setShowCreateCompany] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    // Show create company modal for first-time users after a brief delay
+    if (!hasCompany) {
+      const timer = setTimeout(() => setShowCreateCompany(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasCompany]);
 
   // Get all valid videos
   const validVideos = useMemo(() => filterValidVideos(INITIAL_VIDEOS), []);
@@ -67,7 +94,6 @@ export const Dashboard: React.FC = () => {
 
   // Get recommended videos (based on tags from watched videos)
   const recommendedVideos = useMemo(() => {
-    // For now, just return popular videos not in continue watching
     const watchedIds = new Set(continueWatching.map(h => h.videoId));
     return validVideos
       .filter(v => !watchedIds.has(v.id) && !v.isVertical)
@@ -110,59 +136,102 @@ export const Dashboard: React.FC = () => {
     ].filter(Boolean);
   }, [validVideos]);
 
+  // Handle company creation
+  const handleCreateCompany = (name: string, description: string, industry: 'saas' | 'consumer' | 'marketplace' | 'fintech' | 'healthtech' | 'other') => {
+    createCompany(name, description, industry);
+    setShowCreateCompany(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#0D0D12]">
+      {/* Create Company Modal */}
+      <CreateCompanyModal
+        isOpen={showCreateCompany}
+        onClose={() => setShowCreateCompany(false)}
+        onCreateCompany={handleCreateCompany}
+      />
+
       {/* Hero Carousel - with top padding for nav */}
       <div className="pt-14">
         <HeroCarousel items={heroCarouselItems} autoPlayInterval={8000} />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Header - Below Carousel */}
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="mc-heading text-2xl md:text-3xl text-white">
-                {greeting}, Founder!
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
-                <span
-                  className="px-3 py-1 rounded-full font-medium"
-                  style={{ backgroundColor: levelDefinition.color, color: 'white' }}
-                >
-                  Level {level} - {levelDefinition.title}
-                </span>
-                <span className="flex items-center gap-1 text-[#FF9600]">
-                  <Flame className="w-4 h-4" />
-                  {stats.currentStreak} day grind streak
-                </span>
-                <span className="flex items-center gap-1 text-[#58CC02]">
-                  <Zap className="w-4 h-4" />
-                  {stats.totalXP.toLocaleString()} HP
-                </span>
-              </div>
-            </div>
+        {/* Founder HQ - Show if company exists */}
+        {founderJourney && (
+          <div className="mb-8">
+            <FounderHQ
+              journey={founderJourney}
+              streak={stats.currentStreak}
+              onViewDetails={() => navigate('/profile')}
+            />
+          </div>
+        )}
 
-            {/* XP Progress */}
-            <div className="w-full md:w-64">
-              <div className="flex justify-between text-xs text-[#9CA3AF] mb-1">
-                <span>Level {level + 1}</span>
-                <span>{xpProgress.current}/{xpProgress.needed} HP</span>
+        {/* Welcome Header (for users without company) */}
+        {!founderJourney && (
+          <div className="mb-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="mc-heading text-2xl md:text-3xl text-white">
+                  {greeting}, Founder!
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
+                  <span
+                    className="px-3 py-1 rounded-full font-medium"
+                    style={{ backgroundColor: levelDefinition.color, color: 'white' }}
+                  >
+                    Level {level} - {levelDefinition.title}
+                  </span>
+                  <span className="flex items-center gap-1 text-[#FF9600]">
+                    <Flame className="w-4 h-4" />
+                    {stats.currentStreak} day grind streak
+                  </span>
+                  <span className="flex items-center gap-1 text-[#58CC02]">
+                    <Zap className="w-4 h-4" />
+                    {stats.totalXP.toLocaleString()} HP
+                  </span>
+                </div>
               </div>
-              <div className="h-2 bg-[#1E1E2E] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${xpProgress.progress}%`, backgroundColor: levelDefinition.color }}
-                />
-              </div>
+
+              {/* Start Journey Button */}
+              <button
+                onClick={() => setShowCreateCompany(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#c9a227] to-[#d4af37] text-black font-semibold rounded-xl hover:opacity-90 transition-opacity"
+              >
+                <Rocket className="w-5 h-5" />
+                Start Your Journey
+              </button>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Continue Watching / Live Now Row */}
+        {/* Main Dashboard Grid */}
         <div className="grid lg:grid-cols-3 gap-6 mb-10">
-          {/* Continue Learning or Start Building */}
-          <div className="lg:col-span-2">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Daily Missions */}
+            <DailyMissions
+              missions={dailyMissions}
+              streak={stats.currentStreak}
+            />
+
+            {/* Continue Journey / Continue Watching */}
+            {(continueWatching.length > 0 || Object.keys(gameSessions).length > 0) && (
+              <ContinueJourney
+                watchHistory={continueWatching}
+                gameSessions={gameSessions}
+                videos={validVideos}
+                inProgressModules={Object.entries(progress.modulesInProgress || {}).map(([id, mod]) => ({
+                  moduleId: id,
+                  title: mod.moduleId,
+                  progress: mod.percentComplete,
+                  courseTitle: 'Course',
+                }))}
+              />
+            )}
+
+            {/* Hero Card - Continue Learning or Start Building */}
             {continueVideo ? (
               <button
                 onClick={() => navigate(`/watch/${continueVideo.video.id}?t=${continueVideo.timestamp}`)}
@@ -175,47 +244,46 @@ export const Dashboard: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-                  {/* Play button */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Play className="w-8 h-8 text-white fill-white" />
                     </div>
                   </div>
-
-                  {/* Info overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <p className="mc-label text-[#c9a227] mb-1">
-                      Pick Up The Grind
-                    </p>
+                    <p className="mc-label text-[#c9a227] mb-1">Pick Up The Grind</p>
                     <h3 className="font-display text-xl font-bold text-white mb-1">{continueVideo.video.title}</h3>
                     <p className="text-sm text-white/70">{continueVideo.video.expert}</p>
                   </div>
-
-                  {/* Progress bar */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/50">
-                    <div
-                      className="h-full bg-[#c9a227]"
-                      style={{ width: `${continueVideo.progress}%` }}
-                    />
+                    <div className="h-full bg-[#c9a227]" style={{ width: `${continueVideo.progress}%` }} />
                   </div>
                 </div>
               </button>
             ) : (
               <Link
                 to="/courses"
-                className="flex flex-col items-center justify-center w-full h-full min-h-[280px] bg-gradient-to-br from-[#c9a227] to-[#a88520] rounded-2xl p-8 text-center hover:opacity-90 transition-opacity"
+                className="flex flex-col items-center justify-center w-full min-h-[200px] bg-gradient-to-br from-[#c9a227] to-[#a88520] rounded-2xl p-8 text-center hover:opacity-90 transition-opacity"
               >
-                <BookOpen className="w-16 h-16 text-black mb-6" />
-                <h3 className="font-display text-2xl font-bold text-black mb-3">Start Building</h3>
-                <p className="text-black/80 text-lg max-w-md">Battle-tested playbooks from founders who've done it</p>
+                <BookOpen className="w-12 h-12 text-black mb-4" />
+                <h3 className="font-display text-xl font-bold text-black mb-2">Start Building</h3>
+                <p className="text-black/80 text-sm max-w-md">Battle-tested playbooks from founders who've done it</p>
               </Link>
             )}
           </div>
 
-          {/* Live Now */}
-          <div className="lg:col-span-1">
-            <div className="bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden h-full">
+          {/* Right Column - Sidebar */}
+          <div className="space-y-6">
+            {/* Milestone Card */}
+            {currentMilestone && founderJourney && (
+              <MilestoneCard
+                milestone={currentMilestone}
+                userProgress={progress}
+                currentStage={founderJourney.stage}
+              />
+            )}
+
+            {/* Live Now */}
+            <div className="bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden">
               <div className="px-5 py-4 border-b border-[#2E2E3E] flex items-center justify-between">
                 <h2 className="font-semibold text-white flex items-center gap-2">
                   <Tv className="w-5 h-5 text-red-500" />
@@ -260,7 +328,39 @@ export const Dashboard: React.FC = () => {
                 <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
+
+            {/* XP Progress Card */}
+            <div className="bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{ backgroundColor: levelDefinition.color, color: 'white' }}
+                >
+                  Level {level}
+                </span>
+                <span className="text-sm text-[#9CA3AF]">{levelDefinition.title}</span>
+              </div>
+              <div className="flex justify-between text-xs text-[#9CA3AF] mb-2">
+                <span>Progress to Level {level + 1}</span>
+                <span>{xpProgress.current}/{xpProgress.needed} XP</span>
+              </div>
+              <div className="h-2 bg-[#2E2E3E] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${xpProgress.progress}%`, backgroundColor: levelDefinition.color }}
+                />
+              </div>
+            </div>
           </div>
+        </div>
+
+        {/* Game Center */}
+        <div className="mb-10">
+          <GameCenter
+            gameSessions={gameSessions}
+            currentStage={founderJourney?.stage || 'idea'}
+            onSeeAll={() => navigate('/games')}
+          />
         </div>
 
         {/* Progress Stats */}
@@ -321,7 +421,6 @@ export const Dashboard: React.FC = () => {
                   <div className="absolute top-2 left-2 p-1.5 bg-[#FF0000]/90 rounded-full">
                     <Smartphone className="w-3 h-3 text-white" />
                   </div>
-                  {/* Play overlay on hover */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
                       <Play className="w-4 h-4 text-black fill-black ml-0.5" />
@@ -424,48 +523,6 @@ export const Dashboard: React.FC = () => {
               </button>
             ))}
           </div>
-        </section>
-
-        {/* Quick Actions Row */}
-        <section className="grid md:grid-cols-2 gap-4">
-          <Link
-            to="/games"
-            className="bg-[#1A1A24] rounded-xl border border-[#2E2E3E] p-5 hover:border-[#c9a227]/50 transition-all group"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#c9a227] to-[#a88520] flex items-center justify-center flex-shrink-0">
-                <Gamepad2 className="w-6 h-6 text-black" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-white group-hover:text-[#c9a227] transition-colors">
-                  Sharpen Your Edge
-                </h3>
-                <p className="text-sm text-[#6B7280]">
-                  Quick challenges to test your knowledge
-                </p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280] group-hover:text-white transition-colors flex-shrink-0" />
-            </div>
-          </Link>
-          <Link
-            to="/learn"
-            className="bg-[#1A1A24] rounded-xl border border-[#2E2E3E] p-5 hover:border-[#c9a227]/50 transition-all group"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-base font-semibold text-white group-hover:text-[#c9a227] transition-colors">
-                  Flashcards & Quizzes
-                </h3>
-                <p className="text-sm text-[#6B7280]">
-                  Reinforce key startup concepts
-                </p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280] group-hover:text-white transition-colors flex-shrink-0" />
-            </div>
-          </Link>
         </section>
       </div>
     </div>
