@@ -9,6 +9,28 @@ const FAILED_VIDEOS_KEY = 'fasterclass_failed_videos';
 const VALIDATION_CACHE_KEY = 'fasterclass_video_validation_cache';
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
+// Known failed/unembeddable YouTube video IDs (validated 2024)
+const KNOWN_FAILED_VIDEO_IDS = new Set([
+  '1nECMnpRz00', '2MHnoob3HME', '2MJmPTOg0UU', '2lOqKcNSyww', '3L8sOdO0bOc',
+  '3qlG4BHlJmU', '4CJPDfvf8Lk', '4duqI8WyfqQ', '5aIdSvXUZeo', '6FIuYOhL8gI',
+  '6TfWgKL4I4A', '7qiTsfFHZQI', '7z4xyGjIZhQ', '8q5kPF4xLR4', '9xN4PJYVrLs',
+  'A3aEvT-CqZE', 'BJ2sJNOCM9g', 'Cwi4Xo5KYog', 'E-MdX-YbWGo', 'E_vTg-H3c4g',
+  'F3s_EDWNPQY', 'Fy12YYT8qSw', 'Gqh5NWKp_WU', 'HjcZ8kIKKM8', 'HlJU55g9xyc',
+  'Hq89wYzG-GM', 'IKBnLZr0ckE', 'JnTvM3d2Hu8', 'Jx0VwJD9XPg', 'K0CQe2Q5Ww4',
+  'K3y7Nm1Z9CM', 'K8nH_N6RLqQ', 'KfHsNqYPVIU', 'Oc3VN8z3dJw', 'QH0NJ0AKxDw',
+  'Qjb5lz-kfUA', 'S5wKvYDJDyE', 'SLRpOp8t2rY', 'STM3VUvR7fM', 'Sb_-wfmJnRM',
+  'T4z_VhJrwKM', 'TJ5v3RPVMig', 'UYN6W1cxn_I', 'UjL6NSVB5u4', 'V7z_Nj8RcL8',
+  'VT1awJlbo8Q', 'VbKjWMNPbLk', 'Y5sL9VKg4n0', 'YxjpNsoP-jA', 'ZbrzdMaumNk',
+  'aCfJuTGfIvU', 'b5qIEXC_F5c', 'bn_POjTJzts', 'cJ8sN2jLCz4', 'cQaXxNkjEWk',
+  'c_DOGxFMgXY', 'dQ7ZvKyWP4Y', 'g5B6X2pPzF8', 'gDGR0p1-HpY', 'gkN0d3x7yME',
+  'h3g8vLF4Ep4', 'hJLrnS6K9LI', 'i-7VLiSTqwU', 'iZvesrCPJm0', 'ij7E4CRp1dI',
+  'jGwO_UgTS7I', 'jbx6tJf7kWY', 'lqDvikbLThM', 'mOLnYfZRYXA', 'nA-YSbzx6g8',
+  'nB7KDrH_HzI', 'nM4e3Qcv7XU', 'oQOvIFM4nZc', 'qw76qfN5xXg', 'rBg5Pd8xjMA',
+  'rZ3tY9n8cEA', 'rk9qBOGSLdM', 's3rYDqT7x8I', 'vL7gXqKJ8qc', 'v_mS-z7QGqw',
+  'wMSB2oLqoJE', 'xSxBjXJrOdE', 'xdKb_m8mOjs', 'xkh3nTVvlYA', 'yR-_S0bqYsg',
+  'zOPA0NaeTBk', 'zyxmjJGIjqY'
+]);
+
 interface ValidationCache {
   [videoId: string]: {
     isValid: boolean;
@@ -21,18 +43,23 @@ interface FailedVideosStore {
   lastUpdated: number;
 }
 
-// Get failed videos from localStorage
+// Get failed videos from localStorage + known failed list
 export const getFailedVideos = (): Set<string> => {
+  // Start with known failed videos
+  const failed = new Set(KNOWN_FAILED_VIDEO_IDS);
+
+  // Add any runtime-detected failures from localStorage
   try {
     const stored = localStorage.getItem(FAILED_VIDEOS_KEY);
     if (stored) {
       const data: FailedVideosStore = JSON.parse(stored);
-      return new Set(data.videoIds);
+      data.videoIds.forEach(id => failed.add(id));
     }
   } catch (e) {
     console.warn('Failed to load failed videos from storage:', e);
   }
-  return new Set();
+
+  return failed;
 };
 
 // Add a video to the failed list
