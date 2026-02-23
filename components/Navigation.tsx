@@ -50,12 +50,11 @@ const Navigation: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Desktop nav items
+  // Desktop nav items (Feed is mobile-only, accessed via Watch menu)
   const navItems = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/live', label: 'Live', icon: Tv, hasLiveBadge: true },
     { path: '/vod', label: 'VOD', icon: Play, isAccent: true },
-    { path: '/feed', label: 'Feed', icon: Clapperboard },
     { path: '/courses', label: 'Courses', icon: BookOpen, matchAlso: '/course' },
     { path: '/learn', label: 'Learn', icon: GraduationCap, matchAlso: '/learn' },
     { path: '/games', label: 'Games', icon: Gamepad2 },
