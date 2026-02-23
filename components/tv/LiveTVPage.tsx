@@ -94,10 +94,10 @@ export const LiveTVPage: React.FC = () => {
   const scheduleRef = useRef<ChannelSchedule | null>(null); // Store schedule for cleanup
   const channelRef = useRef<FastChannel>(currentChannel); // Store channel for cleanup
   const dvrOffsetRef = useRef<number | null>(null); // Store DVR offset for cleanup
-  const enablePiPRef = useRef(enablePiP); // Store enablePiP for cleanup
-  const isPiPActiveRef = useRef(isPiPActive); // Store isPiPActive for cleanup
   const { enablePiP, disablePiP, isActive: isPiPActive } = usePiP();
   const { playlists } = useLibrary();
+  const enablePiPRef = useRef(enablePiP); // Store enablePiP for cleanup
+  const isPiPActiveRef = useRef(isPiPActive); // Store isPiPActive for cleanup
 
   // Convert user playlists to virtual FastChannel objects
   const userChannels: FastChannel[] = useMemo(() => {
