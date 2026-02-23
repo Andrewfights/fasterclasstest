@@ -55,6 +55,51 @@ export interface LoginCredentials {
   password: string;
 }
 
+// User Profile Types
+export interface UserProfile {
+  id: string;
+  email: string;
+  displayName: string;
+  profilePicture?: string;  // Base64 encoded image
+  companyName?: string;
+  companyLogo?: string;     // Base64 encoded image
+  bio?: string;
+  website?: string;
+  twitter?: string;
+  linkedin?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+// Startup Checklist Types
+export type ChecklistCategory =
+  | 'legal'
+  | 'finance'
+  | 'product'
+  | 'marketing'
+  | 'operations'
+  | 'team';
+
+export interface ChecklistItem {
+  id: string;
+  title: string;
+  description: string;
+  category: ChecklistCategory;
+  order: number;
+  resources?: {
+    title: string;
+    url?: string;
+    videoId?: string;
+  }[];
+  tips?: string[];
+}
+
+export interface UserChecklist {
+  completedItems: string[];
+  notes: Record<string, string>;  // itemId -> user notes
+  lastUpdated: number;
+}
+
 export interface DataExport {
   videos: Video[];
   playlists: Playlist[];

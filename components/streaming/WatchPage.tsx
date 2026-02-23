@@ -16,11 +16,19 @@ export const WatchPage: React.FC = () => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [watchFromStart, setWatchFromStart] = useState(false);
   const currentTimeRef = useRef<number>(0);
-  const autoPiPEnabledRef = useRef<boolean>(true); // Track if auto-PiP should trigger
 
   const video = INITIAL_VIDEOS.find(v => v.id === videoId);
   const saved = videoId ? isVideoSaved(videoId) : false;
   const progress = videoId ? getVideoProgress(videoId) : undefined;
+
+  // Disable PiP when entering watch page - we want full screen player
+  useEffect(() => {
+    if (isPiPActive) {
+      disablePiP();
+    }
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Get resume time from URL query param or saved progress
   const urlResumeTime = searchParams.get('t');
@@ -50,34 +58,11 @@ export const WatchPage: React.FC = () => {
     }
   }, [videoId]);
 
-  // Auto-PiP when navigating away from video
+  // Track current time for potential PiP
   useEffect(() => {
-    // Store current time from resume time (will be updated by progress tracking)
     currentTimeRef.current = resumeTime;
+  }, [resumeTime]);
 
-    // Cleanup - enable PiP when unmounting if not already in PiP
-    return () => {
-      if (video && autoPiPEnabledRef.current && !isPiPActive) {
-        enablePiP({
-          videoId: video.id,
-          embedUrl: video.embedUrl,
-          title: video.title,
-          expert: video.expert,
-          thumbnail: video.thumbnail,
-          duration: video.duration,
-          startTime: currentTimeRef.current || resumeTime,
-          isLive: false,
-        });
-      }
-    };
-  }, [video, resumeTime]);
-
-  // Disable auto-PiP when manually enabling PiP (prevents double activation)
-  useEffect(() => {
-    if (isPiPActive) {
-      autoPiPEnabledRef.current = false;
-    }
-  }, [isPiPActive]);
 
   // Handle watch from start
   const handleWatchFromStart = useCallback(() => {

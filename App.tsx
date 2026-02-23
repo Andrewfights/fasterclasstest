@@ -32,6 +32,7 @@ import { SearchPage } from './components/search';
 
 // Profile
 import { ProfilePage } from './components/profile';
+import { StartupChecklist } from './components/profile/StartupChecklist';
 
 // Games
 import { GamesPage } from './components/games';
@@ -257,6 +258,7 @@ function App() {
 
                   {/* Profile */}
                   <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/checklist" element={<StartupChecklist />} />
 
                   {/* Games */}
                   <Route path="/games" element={<GamesPage />} />
