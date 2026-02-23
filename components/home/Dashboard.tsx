@@ -1,0 +1,377 @@
+import React, { useEffect, useMemo } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  Play,
+  Tv,
+  Flame,
+  Zap,
+  ChevronRight,
+  BookOpen,
+  Trophy,
+  PlayCircle,
+  Gamepad2,
+} from 'lucide-react';
+import { useGamification } from '../../contexts/GamificationContext';
+import { useLibrary } from '../../contexts/LibraryContext';
+import { gamificationService } from '../../services/gamificationService';
+import { INITIAL_VIDEOS, FAST_CHANNELS, COURSES, formatDuration } from '../../constants';
+import { FastChannel, Video } from '../../types';
+
+// Get what's currently playing on a channel
+const getChannelNowPlaying = (channel: FastChannel, videos: Video[]): Video | null => {
+  const channelVideos = channel.videoIds
+    .map(id => videos.find(v => v.id === id))
+    .filter(Boolean) as Video[];
+
+  if (channelVideos.length === 0) return null;
+
+  const totalDuration = channelVideos.reduce((acc, v) => acc + v.duration, 0);
+  const now = Date.now() / 1000;
+  const loopPosition = now % totalDuration;
+
+  let accumulated = 0;
+  for (const video of channelVideos) {
+    if (accumulated + video.duration > loopPosition) {
+      return video;
+    }
+    accumulated += video.duration;
+  }
+  return channelVideos[0];
+};
+
+export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { level, levelDefinition, xpProgress, progress } = useGamification();
+  const { continueWatching, savedVideos, getVideoProgress } = useLibrary();
+  const stats = gamificationService.getStats();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Get continue watching video
+  const continueVideo = useMemo(() => {
+    if (continueWatching.length === 0) return null;
+    const historyItem = continueWatching[0];
+    const video = INITIAL_VIDEOS.find(v => v.id === historyItem.videoId);
+    if (!video) return null;
+    const progressPercent = Math.round((historyItem.timestamp / video.duration) * 100);
+    return { video, progress: progressPercent, timestamp: historyItem.timestamp };
+  }, [continueWatching]);
+
+  // Get recommended videos (based on tags from watched videos)
+  const recommendedVideos = useMemo(() => {
+    // For now, just return popular videos not in continue watching
+    const watchedIds = new Set(continueWatching.map(h => h.videoId));
+    return INITIAL_VIDEOS
+      .filter(v => !watchedIds.has(v.id))
+      .slice(0, 10);
+  }, [continueWatching]);
+
+  // Get featured channels with current video
+  const featuredChannels = useMemo(() => {
+    return FAST_CHANNELS.slice(0, 3).map(channel => ({
+      channel,
+      nowPlaying: getChannelNowPlaying(channel, INITIAL_VIDEOS),
+    }));
+  }, []);
+
+  // Get time-based greeting (hustle style)
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Rise and grind';
+    if (hour < 17) return "Let's build";
+    return 'Time to build';
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#0D0D12] pt-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                {greeting}, Founder!
+              </h1>
+              <div className="flex items-center gap-4 mt-2 text-sm">
+                <span
+                  className="px-3 py-1 rounded-full font-medium"
+                  style={{ backgroundColor: levelDefinition.color, color: 'white' }}
+                >
+                  Level {level} - {levelDefinition.title}
+                </span>
+                <span className="flex items-center gap-1 text-[#FF9600]">
+                  <Flame className="w-4 h-4" />
+                  {stats.currentStreak} day grind streak
+                </span>
+                <span className="flex items-center gap-1 text-[#58CC02]">
+                  <Zap className="w-4 h-4" />
+                  {stats.totalXP.toLocaleString()} HP
+                </span>
+              </div>
+            </div>
+
+            {/* XP Progress */}
+            <div className="w-full md:w-64">
+              <div className="flex justify-between text-xs text-[#9CA3AF] mb-1">
+                <span>Level {level + 1}</span>
+                <span>{xpProgress.current}/{xpProgress.needed} HP</span>
+              </div>
+              <div className="h-2 bg-[#1E1E2E] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${xpProgress.progress}%`, backgroundColor: levelDefinition.color }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-3 gap-6 mb-10">
+          {/* Continue Learning */}
+          <div className="lg:col-span-2">
+            {continueVideo ? (
+              <button
+                onClick={() => navigate(`/watch/${continueVideo.video.id}?t=${continueVideo.timestamp}`)}
+                className="w-full bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden hover:border-[#8B5CF6]/50 transition-all group"
+              >
+                <div className="relative aspect-video">
+                  <img
+                    src={continueVideo.video.thumbnail}
+                    alt={continueVideo.video.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+                  {/* Play button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Play className="w-8 h-8 text-white fill-white" />
+                    </div>
+                  </div>
+
+                  {/* Info overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <p className="text-xs text-[#8B5CF6] font-semibold uppercase tracking-wide mb-1">
+                      Pick Up The Grind
+                    </p>
+                    <h3 className="text-xl font-bold text-white mb-1">{continueVideo.video.title}</h3>
+                    <p className="text-sm text-white/70">{continueVideo.video.expert}</p>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/50">
+                    <div
+                      className="h-full bg-[#8B5CF6]"
+                      style={{ width: `${continueVideo.progress}%` }}
+                    />
+                  </div>
+                </div>
+              </button>
+            ) : (
+              <Link
+                to="/courses"
+                className="block w-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] rounded-2xl p-8 text-center hover:opacity-90 transition-opacity"
+              >
+                <BookOpen className="w-12 h-12 text-white mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Start Building</h3>
+                <p className="text-white/80">Battle-tested playbooks from founders who've done it</p>
+              </Link>
+            )}
+          </div>
+
+          {/* Live Now */}
+          <div className="lg:col-span-1">
+            <div className="bg-[#1A1A24] rounded-2xl border border-[#2E2E3E] overflow-hidden h-full">
+              <div className="px-5 py-4 border-b border-[#2E2E3E] flex items-center justify-between">
+                <h2 className="font-semibold text-white flex items-center gap-2">
+                  <Tv className="w-5 h-5 text-red-500" />
+                  Live Drops
+                </h2>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+              </div>
+
+              {featuredChannels[0] && featuredChannels[0].nowPlaying && (
+                <button
+                  onClick={() => navigate('/live')}
+                  className="w-full text-left hover:bg-[#2E2E3E]/50 transition-colors"
+                >
+                  <div className="relative aspect-video">
+                    <img
+                      src={featuredChannels[0].nowPlaying.thumbnail}
+                      alt={featuredChannels[0].nowPlaying.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{featuredChannels[0].channel.logo}</span>
+                        <span className="text-xs text-white/60">{featuredChannels[0].channel.name}</span>
+                      </div>
+                      <p className="text-sm font-medium text-white line-clamp-2">
+                        {featuredChannels[0].nowPlaying.title}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              )}
+
+              <Link
+                to="/live"
+                className="flex items-center justify-between px-5 py-3 text-sm text-[#8B5CF6] hover:bg-[#2E2E3E]/30 transition-colors"
+              >
+                <span>View All Channels</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="bg-[#1A1A24] rounded-xl p-5 border border-[#2E2E3E]">
+            <PlayCircle className="w-8 h-8 text-[#1CB0F6] mb-3" />
+            <p className="text-2xl font-bold text-white">{stats.videosWatched}</p>
+            <p className="text-sm text-[#9CA3AF]">Sessions Crushed</p>
+          </div>
+          <div className="bg-[#1A1A24] rounded-xl p-5 border border-[#2E2E3E]">
+            <BookOpen className="w-8 h-8 text-[#8B5CF6] mb-3" />
+            <p className="text-2xl font-bold text-white">{progress.modulesCompleted.length}</p>
+            <p className="text-sm text-[#9CA3AF]">Playbooks Mastered</p>
+          </div>
+          <div className="bg-[#1A1A24] rounded-xl p-5 border border-[#2E2E3E]">
+            <Trophy className="w-8 h-8 text-[#FFD700] mb-3" />
+            <p className="text-2xl font-bold text-white">{stats.achievementsUnlocked}</p>
+            <p className="text-sm text-[#9CA3AF]">Milestones</p>
+          </div>
+          <div className="bg-[#1A1A24] rounded-xl p-5 border border-[#2E2E3E]">
+            <Flame className="w-8 h-8 text-[#FF9600] mb-3" />
+            <p className="text-2xl font-bold text-white">{stats.longestStreak}</p>
+            <p className="text-sm text-[#9CA3AF]">Best Grind</p>
+          </div>
+        </div>
+
+        {/* Recommended Videos */}
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">Curated For Your Hustle</h2>
+            <Link
+              to="/vod"
+              className="text-sm text-[#8B5CF6] hover:text-[#A78BFA] transition-colors flex items-center gap-1"
+            >
+              Explore More <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+            {recommendedVideos.map(video => (
+              <button
+                key={video.id}
+                onClick={() => navigate(`/watch/${video.id}`)}
+                className="flex-shrink-0 w-48 group"
+              >
+                <div className="relative aspect-video rounded-lg overflow-hidden mb-2">
+                  <img
+                    src={video.thumbnail}
+                    alt={video.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                  <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 rounded text-[10px] text-white">
+                    {formatDuration(video.duration)}
+                  </div>
+                </div>
+                <h3 className="text-sm font-medium text-white line-clamp-2 group-hover:text-[#8B5CF6] transition-colors">
+                  {video.title}
+                </h3>
+                <p className="text-xs text-[#6B7280] mt-0.5">{video.expert}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Live TV Channels */}
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">Founders Are Tuning In</h2>
+            <Link
+              to="/live"
+              className="text-sm text-[#8B5CF6] hover:text-[#A78BFA] transition-colors flex items-center gap-1"
+            >
+              All Channels <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            {featuredChannels.map(({ channel, nowPlaying }) => (
+              <button
+                key={channel.id}
+                onClick={() => navigate('/live')}
+                className="bg-[#1A1A24] rounded-xl border border-[#2E2E3E] overflow-hidden hover:border-[#8B5CF6]/50 transition-all text-left group"
+              >
+                <div className="relative aspect-video">
+                  {nowPlaying && (
+                    <img
+                      src={nowPlaying.thumbnail}
+                      alt={nowPlaying.title}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-lg"
+                      style={{ backgroundColor: channel.color + '40' }}
+                    >
+                      {channel.logo}
+                    </div>
+                    <span className="text-xs font-medium text-white">{channel.name}</span>
+                  </div>
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="px-1.5 py-0.5 bg-red-500 text-[8px] font-bold rounded">LIVE</span>
+                    </div>
+                    {nowPlaying && (
+                      <p className="text-sm font-medium text-white line-clamp-1">
+                        {nowPlaying.title}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Quick Game CTA */}
+        <section>
+          <Link
+            to="/games"
+            className="block bg-gradient-to-r from-[#8B5CF6]/20 to-[#6366F1]/20 rounded-2xl border border-[#8B5CF6]/30 p-6 hover:border-[#8B5CF6]/60 transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#6366F1] flex items-center justify-center">
+                  <Gamepad2 className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white group-hover:text-[#A78BFA] transition-colors">
+                    Sharpen Your Edge
+                  </h3>
+                  <p className="text-sm text-[#9CA3AF]">
+                    Quick challenges to keep your mind sharp
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-6 h-6 text-[#9CA3AF] group-hover:text-white transition-colors" />
+            </div>
+          </Link>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

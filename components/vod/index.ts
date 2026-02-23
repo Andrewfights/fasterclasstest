@@ -1,0 +1,1 @@
+export { VODPage } from './VODPage';
