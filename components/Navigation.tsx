@@ -17,6 +17,7 @@ import {
   GraduationCap,
   MonitorPlay,
   ChevronUp,
+  Clapperboard,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useGamification } from '../contexts/GamificationContext';
@@ -54,6 +55,7 @@ const Navigation: React.FC = () => {
     { path: '/', label: 'Home', icon: Home },
     { path: '/live', label: 'Live', icon: Tv, hasLiveBadge: true },
     { path: '/vod', label: 'VOD', icon: Play, isAccent: true },
+    { path: '/feed', label: 'Feed', icon: Clapperboard },
     { path: '/courses', label: 'Courses', icon: BookOpen, matchAlso: '/course' },
     { path: '/learn', label: 'Learn', icon: GraduationCap, matchAlso: '/learn' },
     { path: '/games', label: 'Games', icon: Gamepad2 },

@@ -30,6 +30,9 @@ import { LiveTVPage } from './components/tv';
 // Search
 import { SearchPage } from './components/search';
 
+// Vertical Feed (Social/Shorts)
+import { VerticalFeed } from './components/feed';
+
 // Profile
 import { ProfilePage } from './components/profile';
 import { StartupChecklist } from './components/profile/StartupChecklist';
@@ -256,6 +259,9 @@ function App() {
 
                   {/* Live TV - Pluto TV Style */}
                   <Route path="/live" element={<LiveTVPage />} />
+
+                  {/* Vertical Feed - Social/Shorts */}
+                  <Route path="/feed" element={<VerticalFeed />} />
 
                   {/* Profile */}
                   <Route path="/profile" element={<ProfilePage />} />
