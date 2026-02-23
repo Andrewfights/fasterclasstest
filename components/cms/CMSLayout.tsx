@@ -10,6 +10,7 @@ import {
   GraduationCap,
   ArrowLeft,
   LogOut,
+  Film,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -22,6 +23,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: '/admin', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard' },
   { to: '/admin/videos', icon: <Video className="w-5 h-5" />, label: 'Videos' },
+  { to: '/admin/episodes', icon: <Film className="w-5 h-5" />, label: 'Episodes' },
   { to: '/admin/courses', icon: <BookOpen className="w-5 h-5" />, label: 'Courses' },
   { to: '/admin/channels', icon: <Tv className="w-5 h-5" />, label: 'Channels' },
   { to: '/admin/homepage', icon: <Home className="w-5 h-5" />, label: 'Homepage' },

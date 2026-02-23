@@ -4,3 +4,4 @@ export { VideoManager } from './VideoManager';
 export { CourseManager } from './CourseManager';
 export { ChannelManager } from './ChannelManager';
 export { HomepageEditor } from './HomepageEditor';
+export { EpisodeManager } from './EpisodeManager';

@@ -11,8 +11,11 @@ import {
   Check,
   Clock,
   Tag,
+  Image,
+  Scissors,
+  Radio,
 } from 'lucide-react';
-import { Video } from '../../types';
+import { Video, DistributionChannel } from '../../types';
 import { INITIAL_VIDEOS, getYoutubeId, formatDuration } from '../../constants';
 
 interface VideoFormData {
@@ -22,6 +25,10 @@ interface VideoFormData {
   url: string;
   tags: string[];
   isVertical: boolean;
+  customThumbnail: string;
+  startTime: number;
+  endTime: number;
+  distribution: DistributionChannel;
 }
 
 export const VideoManager: React.FC = () => {
@@ -277,10 +284,17 @@ const VideoModal: React.FC<VideoModalProps> = ({ video, onClose, onSave }) => {
     url: video?.url || '',
     tags: video?.tags || [],
     isVertical: video?.isVertical || false,
+    customThumbnail: video?.customThumbnail || '',
+    startTime: video?.startTime || 0,
+    endTime: video?.endTime || 0,
+    distribution: video?.distribution || 'both',
   });
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(
+    !!(video?.customThumbnail || video?.startTime || video?.endTime)
+  );
 
   const handleUrlChange = async (url: string) => {
     setFormData(prev => ({ ...prev, url }));
@@ -319,17 +333,23 @@ const VideoModal: React.FC<VideoModalProps> = ({ video, onClose, onSave }) => {
       return;
     }
 
+    const autoThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
     const newVideo: Video = {
       id: formData.id || `video-${Date.now()}`,
       title: formData.title,
       expert: formData.expert,
       url: formData.url,
-      thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      thumbnail: autoThumbnail,
+      customThumbnail: formData.customThumbnail || undefined,
       embedUrl: `https://www.youtube.com/embed/${videoId}`,
       duration: video?.duration || 0, // Would need API to get actual duration
       platform: 'youtube',
       tags: formData.tags,
       isVertical: formData.isVertical,
+      startTime: formData.startTime || undefined,
+      endTime: formData.endTime || undefined,
+      distribution: formData.distribution,
     };
 
     onSave(newVideo);
@@ -451,6 +471,126 @@ const VideoModal: React.FC<VideoModalProps> = ({ video, onClose, onSave }) => {
               This is a vertical video (YouTube Short)
             </label>
           </div>
+
+          {/* Distribution Channel */}
+          <div>
+            <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+              <Radio className="w-4 h-4 inline mr-1" />
+              Distribution
+            </label>
+            <div className="flex gap-2">
+              {(['vod', 'live', 'both'] as DistributionChannel[]).map((option) => (
+                <button
+                  key={option}
+                  onClick={() => setFormData(prev => ({ ...prev, distribution: option }))}
+                  className={`flex-1 px-4 py-2.5 rounded-xl font-medium transition-colors ${
+                    formData.distribution === option
+                      ? 'bg-[#8B5CF6] text-white'
+                      : 'bg-[#2E2E3E] text-[#9CA3AF] hover:bg-[#3E3E4E]'
+                  }`}
+                >
+                  {option === 'vod' ? 'VOD Only' : option === 'live' ? 'Live Only' : 'Both'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Advanced Settings Toggle */}
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="flex items-center gap-2 text-sm text-[#8B5CF6] hover:text-[#A78BFA] transition-colors"
+          >
+            <Scissors className="w-4 h-4" />
+            {showAdvanced ? 'Hide Advanced Settings' : 'Show Advanced Settings (Thumbnail, Clip Times)'}
+          </button>
+
+          {/* Advanced Settings */}
+          {showAdvanced && (
+            <div className="space-y-4 p-4 bg-[#0D0D12] rounded-xl border border-[#2E2E3E]">
+              {/* Custom Thumbnail */}
+              <div>
+                <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                  <Image className="w-4 h-4 inline mr-1" />
+                  Custom Thumbnail URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.customThumbnail}
+                  onChange={(e) => setFormData(prev => ({ ...prev, customThumbnail: e.target.value }))}
+                  placeholder="Leave empty for auto YouTube thumbnail"
+                  className="w-full px-4 py-2.5 bg-[#1A1A24] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8B5CF6]"
+                />
+                {(formData.customThumbnail || formData.url) && (
+                  <div className="mt-2 flex gap-2">
+                    <div className="flex-1">
+                      <p className="text-xs text-[#6B7280] mb-1">Preview:</p>
+                      <img
+                        src={formData.customThumbnail || `https://img.youtube.com/vi/${getYoutubeId(formData.url)}/hqdefault.jpg`}
+                        alt="Thumbnail preview"
+                        className="w-full aspect-video object-cover rounded-lg"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/320x180?text=Invalid+URL';
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Start/End Time */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                    <Clock className="w-4 h-4 inline mr-1" />
+                    Start Time (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.startTime}
+                    onChange={(e) => setFormData(prev => ({ ...prev, startTime: parseInt(e.target.value) || 0 }))}
+                    placeholder="0"
+                    className="w-full px-4 py-2.5 bg-[#1A1A24] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8B5CF6]"
+                  />
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    {formData.startTime > 0 ? `Starts at ${Math.floor(formData.startTime / 60)}:${(formData.startTime % 60).toString().padStart(2, '0')}` : 'Starts from beginning'}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                    <Clock className="w-4 h-4 inline mr-1" />
+                    End Time (seconds)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.endTime}
+                    onChange={(e) => setFormData(prev => ({ ...prev, endTime: parseInt(e.target.value) || 0 }))}
+                    placeholder="0 = full video"
+                    className="w-full px-4 py-2.5 bg-[#1A1A24] border border-[#2E2E3E] rounded-xl text-white placeholder-[#6B7280] focus:outline-none focus:border-[#8B5CF6]"
+                  />
+                  <p className="text-xs text-[#6B7280] mt-1">
+                    {formData.endTime > 0 ? `Ends at ${Math.floor(formData.endTime / 60)}:${(formData.endTime % 60).toString().padStart(2, '0')}` : 'Plays to end'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Clip Duration Preview */}
+              {formData.startTime > 0 || formData.endTime > 0 ? (
+                <div className="p-3 bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 rounded-xl">
+                  <p className="text-sm text-[#8B5CF6]">
+                    <Scissors className="w-4 h-4 inline mr-1" />
+                    Clip: {Math.floor(formData.startTime / 60)}:{(formData.startTime % 60).toString().padStart(2, '0')} → {formData.endTime > 0 ? `${Math.floor(formData.endTime / 60)}:${(formData.endTime % 60).toString().padStart(2, '0')}` : 'end'}
+                    {formData.endTime > formData.startTime && (
+                      <span className="ml-2 text-[#9CA3AF]">
+                        ({Math.floor((formData.endTime - formData.startTime) / 60)}:{((formData.endTime - formData.startTime) % 60).toString().padStart(2, '0')} duration)
+                      </span>
+                    )}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
 
         {/* Actions */}

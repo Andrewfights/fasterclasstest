@@ -54,6 +54,7 @@ import {
   CourseManager,
   ChannelManager,
   HomepageEditor,
+  EpisodeManager,
 } from './components/cms';
 
 // Playlist player wrapper with route params
@@ -288,6 +289,7 @@ function App() {
                   <Route path="/admin" element={<ProtectedCMSLayout />}>
                     <Route index element={<CMSDashboard />} />
                     <Route path="videos" element={<VideoManager />} />
+                    <Route path="episodes" element={<EpisodeManager />} />
                     <Route path="courses" element={<CourseManager />} />
                     <Route path="channels" element={<ChannelManager />} />
                     <Route path="homepage" element={<HomepageEditor />} />

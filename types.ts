@@ -1,16 +1,43 @@
 import React from 'react';
 
+export type DistributionChannel = 'vod' | 'live' | 'both';
+
 export interface Video {
   id: string;
   title: string;
   expert: string;
   thumbnail: string;
+  customThumbnail?: string;     // Custom thumbnail URL (overrides auto-generated)
   url: string;
   embedUrl: string;
   duration: number;
   platform: 'youtube' | 'other';
   tags: string[];
   isVertical?: boolean;
+  startTime?: number;           // Start playback from this second
+  endTime?: number;             // End playback at this second (for clips)
+  distribution?: DistributionChannel;  // Where this video appears
+}
+
+// Episode - combines multiple video clips into one playable unit
+export interface Episode {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  clips: EpisodeClip[];
+  totalDuration: number;        // Calculated from clips
+  tags: string[];
+  distribution: DistributionChannel;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface EpisodeClip {
+  videoId: string;
+  startTime: number;            // Start of clip within source video
+  endTime: number;              // End of clip within source video
+  order: number;                // Position in episode
 }
 
 export interface Playlist {
