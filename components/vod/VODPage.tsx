@@ -1,16 +1,32 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Film, Smartphone } from 'lucide-react';
 import { CategorySidebar, SidebarCategory } from '../shared/CategorySidebar';
 import { VOD_CATEGORIES, INITIAL_VIDEOS, formatDuration } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { Video, HeroCarouselItem } from '../../types';
 import { HeroCarousel } from './HeroCarousel';
 
+type ContentFormat = 'long' | 'short';
+
 export const VODPage: React.FC = () => {
   const navigate = useNavigate();
   const { continueWatching, savedVideos, getVideoProgress } = useLibrary();
   const [selectedCategory, setSelectedCategory] = useState<string>('featured');
+  const [contentFormat, setContentFormat] = useState<ContentFormat>('long');
+
+  // Filter videos based on content format
+  const formatFilteredVideos = useMemo(() => {
+    if (contentFormat === 'short') {
+      return INITIAL_VIDEOS.filter(v => v.isVertical === true || v.duration <= 120);
+    }
+    return INITIAL_VIDEOS.filter(v => !v.isVertical && v.duration > 120);
+  }, [contentFormat]);
+
+  // Get shorts for the shorts section
+  const shortsVideos = useMemo(() => {
+    return INITIAL_VIDEOS.filter(v => v.isVertical === true || v.duration <= 120);
+  }, []);
 
   // Helper to calculate progress percentage
   const getProgressPercent = (videoId: string, duration: number): number => {
@@ -37,16 +53,16 @@ export const VODPage: React.FC = () => {
     }));
   }, [continueWatching.length]);
 
-  // Get videos for selected category
+  // Get videos for selected category (filtered by content format)
   const getVideosForCategory = (categoryId: string): Video[] => {
     if (categoryId === 'continue') {
       return continueWatching
-        .map(h => INITIAL_VIDEOS.find(v => v.id === h.videoId))
+        .map(h => formatFilteredVideos.find(v => v.id === h.videoId))
         .filter(Boolean) as Video[];
     }
     const category = VOD_CATEGORIES.find(c => c.id === categoryId);
     if (!category) return [];
-    return INITIAL_VIDEOS.filter(category.filter);
+    return formatFilteredVideos.filter(category.filter);
   };
 
   const selectedVideos = getVideosForCategory(selectedCategory);
@@ -68,11 +84,39 @@ export const VODPage: React.FC = () => {
 
         {/* Main Content */}
         <main className="flex-1 ml-56 min-h-screen overflow-hidden">
-          {/* Category Header */}
+          {/* Category Header with Format Toggle */}
           <div className="px-6 lg:px-8 pt-8 pb-4 max-w-7xl">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">{selectedCategoryData?.icon}</span>
-              <h1 className="text-3xl font-bold text-white">{selectedCategoryData?.name}</h1>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{selectedCategoryData?.icon}</span>
+                <h1 className="text-3xl font-bold text-white">{selectedCategoryData?.name}</h1>
+              </div>
+
+              {/* Content Format Toggle */}
+              <div className="flex items-center gap-2 bg-[#1E1E2E] rounded-xl p-1">
+                <button
+                  onClick={() => setContentFormat('long')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    contentFormat === 'long'
+                      ? 'bg-[#F5C518] text-black'
+                      : 'text-[#9CA3AF] hover:text-white'
+                  }`}
+                >
+                  <Film className="w-4 h-4" />
+                  <span className="hidden sm:inline">Long Form</span>
+                </button>
+                <button
+                  onClick={() => setContentFormat('short')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    contentFormat === 'short'
+                      ? 'bg-[#F5C518] text-black'
+                      : 'text-[#9CA3AF] hover:text-white'
+                  }`}
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <span className="hidden sm:inline">Shorts</span>
+                </button>
+              </div>
             </div>
             {selectedCategoryData?.description && (
               <p className="text-[#9CA3AF]">{selectedCategoryData.description}</p>
@@ -93,7 +137,18 @@ export const VODPage: React.FC = () => {
 
           {/* Video Grid */}
           <div className="px-6 lg:px-8 pb-16 max-w-7xl">
-            {selectedCategory !== 'featured' ? (
+            {/* Shorts Layout */}
+            {contentFormat === 'short' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                {shortsVideos.map(video => (
+                  <ShortsCard
+                    key={video.id}
+                    video={video}
+                    onClick={() => navigate(`/watch/${video.id}`)}
+                  />
+                ))}
+              </div>
+            ) : selectedCategory !== 'featured' ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {selectedVideos.map(video => (
                   <VODCard
@@ -348,6 +403,51 @@ const VODCard: React.FC<VODCardProps> = ({ video, progress = 0, onClick, classNa
         {video.title}
       </h3>
       <p className="text-xs text-[#6B7280] mt-0.5">{video.expert}</p>
+    </button>
+  );
+};
+
+// Shorts Card Component (vertical aspect ratio)
+interface ShortsCardProps {
+  video: Video;
+  onClick: () => void;
+}
+
+const ShortsCard: React.FC<ShortsCardProps> = ({ video, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="group text-left w-full"
+    >
+      <div className="relative aspect-[9/16] rounded-xl overflow-hidden mb-2 bg-[#1E1E2E]">
+        <img
+          src={video.thumbnail}
+          alt={video.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+        {/* Duration badge */}
+        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 rounded text-[10px] font-medium text-white">
+          {formatDuration(video.duration)}
+        </div>
+
+        {/* Shorts icon */}
+        <div className="absolute top-2 left-2 p-1.5 bg-[#FF0000]/90 rounded-full">
+          <Smartphone className="w-3 h-3 text-white" />
+        </div>
+
+        {/* Play overlay on hover */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+            <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-black border-b-[8px] border-b-transparent ml-1" />
+          </div>
+        </div>
+      </div>
+      <h3 className="text-xs font-medium text-white line-clamp-2 group-hover:text-[#F5C518] transition-colors">
+        {video.title}
+      </h3>
+      <p className="text-[10px] text-[#6B7280] mt-0.5">{video.expert}</p>
     </button>
   );
 };

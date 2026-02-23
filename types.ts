@@ -190,7 +190,7 @@ export interface GlossaryTerm {
 
 // === FAST CHANNELS (PLUTO TV STYLE) ===
 
-export type FastChannelCategory = 'learning' | 'inspiration' | 'tech' | 'mixed' | 'entrepreneur' | 'creative' | 'education';
+export type FastChannelCategory = 'learning' | 'inspiration' | 'tech' | 'mixed' | 'entrepreneur' | 'creative' | 'education' | 'shorts';
 
 export interface FastChannel {
   id: string;

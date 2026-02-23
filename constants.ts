@@ -1555,6 +1555,251 @@ export const INITIAL_VIDEOS: Video[] = [
     duration: 2400,
     platform: 'youtube',
     tags: ['chatgpt', 'ai', 'prompting', 'programming']
+  },
+
+  // ============================================
+  // SHORTS: VERTICAL SHORT-FORM CONTENT
+  // ============================================
+  // Business & Entrepreneurship Shorts
+  {
+    id: 'short-1',
+    title: 'The Best Advice I Can Give You',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/wMSB2oLqoJE/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/wMSB2oLqoJE',
+    embedUrl: 'https://www.youtube.com/embed/wMSB2oLqoJE',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['mindset', 'leadership', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-2',
+    title: 'Why Most People Will Never Be Successful',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/IKBnLZr0ckE/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/IKBnLZr0ckE',
+    embedUrl: 'https://www.youtube.com/embed/IKBnLZr0ckE',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['mindset', 'success', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-3',
+    title: 'Start With Why in 60 Seconds',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/u4ZoJKF_VuA/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/u4ZoJKF_VuA',
+    embedUrl: 'https://www.youtube.com/embed/u4ZoJKF_VuA',
+    duration: 60,
+    platform: 'youtube',
+    tags: ['why', 'purpose', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-4',
+    title: 'The Difference Between a Boss and a Leader',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/3L8sOdO0bOc/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/3L8sOdO0bOc',
+    embedUrl: 'https://www.youtube.com/embed/3L8sOdO0bOc',
+    duration: 45,
+    platform: 'youtube',
+    tags: ['leadership', 'management', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-5',
+    title: 'How to Stay Motivated',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/ZXsQAXx_ao0/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/ZXsQAXx_ao0',
+    embedUrl: 'https://www.youtube.com/embed/ZXsQAXx_ao0',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['motivation', 'mindset', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-6',
+    title: 'Why You Should Never Give Up',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/mgmVOuLgFB0/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/mgmVOuLgFB0',
+    embedUrl: 'https://www.youtube.com/embed/mgmVOuLgFB0',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['motivation', 'persistence', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-7',
+    title: 'The 5 AM Club - Robin Sharma',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/5MgBikgcWnY/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/5MgBikgcWnY',
+    embedUrl: 'https://www.youtube.com/embed/5MgBikgcWnY',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['productivity', 'morning-routine', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-8',
+    title: 'How to Build Good Habits',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/mNeXuCYiE0U/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/mNeXuCYiE0U',
+    embedUrl: 'https://www.youtube.com/embed/mNeXuCYiE0U',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['habits', 'productivity', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-9',
+    title: 'The Power of Compounding',
+    expert: 'Finance Club',
+    thumbnail: 'https://img.youtube.com/vi/1nECMnpRz00/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/1nECMnpRz00',
+    embedUrl: 'https://www.youtube.com/embed/1nECMnpRz00',
+    duration: 45,
+    platform: 'youtube',
+    tags: ['finance', 'investing', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-10',
+    title: 'Warren Buffett on Success',
+    expert: 'Finance Club',
+    thumbnail: 'https://img.youtube.com/vi/2MHnoob3HME/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/2MHnoob3HME',
+    embedUrl: 'https://www.youtube.com/embed/2MHnoob3HME',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['buffett', 'investing', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-11',
+    title: 'How to Network Like a Pro',
+    expert: 'Business Insider',
+    thumbnail: 'https://img.youtube.com/vi/4CJPDfvf8Lk/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/4CJPDfvf8Lk',
+    embedUrl: 'https://www.youtube.com/embed/4CJPDfvf8Lk',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['networking', 'business', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-12',
+    title: 'How to Pitch Your Startup',
+    expert: 'Y Combinator',
+    thumbnail: 'https://img.youtube.com/vi/Qjb5lz-kfUA/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/Qjb5lz-kfUA',
+    embedUrl: 'https://www.youtube.com/embed/Qjb5lz-kfUA',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['pitch', 'startup', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-13',
+    title: 'Stop Overthinking and Start Doing',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/2lOqKcNSyww/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/2lOqKcNSyww',
+    embedUrl: 'https://www.youtube.com/embed/2lOqKcNSyww',
+    duration: 48,
+    platform: 'youtube',
+    tags: ['action', 'mindset', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-14',
+    title: 'The 1% Rule for Success',
+    expert: 'Growth Mindset',
+    thumbnail: 'https://img.youtube.com/vi/nA-YSbzx6g8/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/nA-YSbzx6g8',
+    embedUrl: 'https://www.youtube.com/embed/nA-YSbzx6g8',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['growth', 'improvement', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-15',
+    title: 'How to Learn Anything Fast',
+    expert: 'Learning Hub',
+    thumbnail: 'https://img.youtube.com/vi/i-7VLiSTqwU/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/i-7VLiSTqwU',
+    embedUrl: 'https://www.youtube.com/embed/i-7VLiSTqwU',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['learning', 'productivity', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-16',
+    title: 'Time Management Tips',
+    expert: 'Productivity Pro',
+    thumbnail: 'https://img.youtube.com/vi/UjL6NSVB5u4/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/UjL6NSVB5u4',
+    embedUrl: 'https://www.youtube.com/embed/UjL6NSVB5u4',
+    duration: 45,
+    platform: 'youtube',
+    tags: ['time-management', 'productivity', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-17',
+    title: 'How to Be More Confident',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/w-HYZv6HzAs/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/w-HYZv6HzAs',
+    embedUrl: 'https://www.youtube.com/embed/w-HYZv6HzAs',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['confidence', 'mindset', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-18',
+    title: 'The Power of Focus',
+    expert: 'Growth Mindset',
+    thumbnail: 'https://img.youtube.com/vi/yR-_S0bqYsg/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/yR-_S0bqYsg',
+    embedUrl: 'https://www.youtube.com/embed/yR-_S0bqYsg',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['focus', 'productivity', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-19',
+    title: 'How to Deal with Failure',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/qw76qfN5xXg/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/qw76qfN5xXg',
+    embedUrl: 'https://www.youtube.com/embed/qw76qfN5xXg',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['failure', 'resilience', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-20',
+    title: 'Discipline Equals Freedom',
+    expert: 'Jocko Willink',
+    thumbnail: 'https://img.youtube.com/vi/IdTMDpizis8/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/IdTMDpizis8',
+    embedUrl: 'https://www.youtube.com/embed/IdTMDpizis8',
+    duration: 45,
+    platform: 'youtube',
+    tags: ['discipline', 'leadership', 'shorts'],
+    isVertical: true
   }
 ];
 
@@ -2446,6 +2691,65 @@ export const FAST_CHANNELS: FastChannel[] = [
     color: '#14B8A6',
     videoIds: ['edit-v1', 'film-v1', 'social-v1', 'design-v1', 'vibe-v1'],
   },
+
+  // ============================================
+  // SHORTS CHANNELS (71-75)
+  // ============================================
+  {
+    id: 'fast-71',
+    number: 71,
+    name: 'Motivation Shorts',
+    shortName: 'MOTV',
+    description: 'Quick motivation and mindset clips.',
+    category: 'shorts',
+    logo: '🔥',
+    color: '#EF4444',
+    videoIds: ['short-1', 'short-2', 'short-5', 'short-6', 'short-13', 'short-17'],
+  },
+  {
+    id: 'fast-72',
+    number: 72,
+    name: 'Leadership Shorts',
+    shortName: 'LEAD',
+    description: 'Quick leadership and management insights.',
+    category: 'shorts',
+    logo: '👔',
+    color: '#3B82F6',
+    videoIds: ['short-3', 'short-4', 'short-11', 'short-20'],
+  },
+  {
+    id: 'fast-73',
+    number: 73,
+    name: 'Productivity Shorts',
+    shortName: 'PROD',
+    description: 'Quick tips for productivity and habits.',
+    category: 'shorts',
+    logo: '⚡',
+    color: '#10B981',
+    videoIds: ['short-7', 'short-8', 'short-15', 'short-16', 'short-18'],
+  },
+  {
+    id: 'fast-74',
+    number: 74,
+    name: 'Finance Shorts',
+    shortName: 'FIN',
+    description: 'Quick money and investing tips.',
+    category: 'shorts',
+    logo: '💰',
+    color: '#F59E0B',
+    videoIds: ['short-9', 'short-10'],
+  },
+  {
+    id: 'fast-75',
+    number: 75,
+    name: 'Success Shorts',
+    shortName: 'WIN',
+    description: 'Mixed shorts on success and growth.',
+    category: 'shorts',
+    logo: '🏆',
+    color: '#8B5CF6',
+    videoIds: ['short-1', 'short-2', 'short-3', 'short-14', 'short-19', 'short-20'],
+  },
 ];
 
 // Helper to extract Youtube ID
@@ -3297,6 +3601,11 @@ export const LIVE_TV_CATEGORIES: LiveTVCategory[] = [
     id: 'creative',
     name: 'Creative',
     filter: (ch) => ch.category === 'creative',
+  },
+  {
+    id: 'shorts',
+    name: 'Shorts',
+    filter: (ch) => ch.category === 'shorts',
   },
 ];
 
