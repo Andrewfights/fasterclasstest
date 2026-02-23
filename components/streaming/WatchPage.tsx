@@ -121,6 +121,27 @@ export const WatchPage: React.FC = () => {
     navigate(-1);
   }, [navigate]);
 
+  // Auto-enable PiP when navigating away from watch page
+  useEffect(() => {
+    return () => {
+      // On unmount (navigation away), enable PiP if we have a video and PiP isn't already active
+      if (video && !isPiPActive) {
+        enablePiP({
+          videoId: video.id,
+          embedUrl: video.embedUrl,
+          title: video.title,
+          expert: video.expert,
+          thumbnail: video.thumbnail,
+          duration: video.duration,
+          startTime: currentTimeRef.current || resumeTime,
+          isLive: false,
+        });
+      }
+    };
+    // Only run cleanup on unmount, not on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [video?.id]);
+
   if (!video) {
     return (
       <div className="min-h-screen bg-[#0D0D12] pt-24 flex items-center justify-center">

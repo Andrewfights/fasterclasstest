@@ -144,6 +144,32 @@ export interface CourseModule {
   videoIds: string[];      // Videos in this module
   quizId?: string;         // Module quiz (optional)
   keyTermIds: string[];    // Glossary term IDs for flashcards
+  homeworkId?: string;     // Homework assignment (optional)
+}
+
+// Homework Assignment (Action Items)
+export interface HomeworkAssignment {
+  id: string;
+  title: string;
+  description: string;
+  actionItems: ActionItem[];
+  dueAfterModule?: string;    // Module ID this homework follows
+  xpReward: number;
+}
+
+export interface ActionItem {
+  id: string;
+  task: string;               // e.g., "Talk to 5 potential customers"
+  hint?: string;              // Optional guidance
+  isRequired: boolean;
+}
+
+export interface UserHomeworkProgress {
+  assignmentId: string;
+  completedItems: string[];   // Array of completed action item IDs
+  notes?: string;             // Optional user notes
+  completedAt?: number;
+  startedAt: number;
 }
 
 // Course (curated learning path)
@@ -181,6 +207,7 @@ export interface UserLibrary {
   savedVideos: string[];
   playlists: UserPlaylist[];
   watchHistory: WatchHistoryItem[];
+  favorites: string[]; // Video IDs that are "hearted"
 }
 
 export interface UserPlaylist {
@@ -190,6 +217,10 @@ export interface UserPlaylist {
   videoIds: string[];
   createdAt: number;
   updatedAt: number;
+  isPublic?: boolean;           // Public/private toggle
+  shareCode?: string;           // For shareable links
+  thumbnail?: string;           // Custom thumbnail
+  color?: string;               // Playlist accent color
 }
 
 export interface WatchHistoryItem {

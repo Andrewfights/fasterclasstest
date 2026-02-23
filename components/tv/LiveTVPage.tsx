@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Volume2, VolumeX, Maximize, Info, ArrowUp, ArrowDown, RotateCcw, Radio, PictureInPicture2, RectangleHorizontal } from 'lucide-react';
 import { CategorySidebar, SidebarCategory } from '../shared/CategorySidebar';
 import { EPGGrid } from './EPGGrid';
 import { FastChannel, ChannelSchedule, Video } from '../../types';
 import { FAST_CHANNELS, INITIAL_VIDEOS, LIVE_TV_CATEGORIES, getYoutubeId, formatDuration } from '../../constants';
 import { usePiP } from '../../contexts/PiPContext';
+import { useLibrary } from '../../contexts/LibraryContext';
 
 // Calculate which video is playing and at what offset for a channel
 const getChannelSchedule = (channel: FastChannel, videos: Video[]): ChannelSchedule | null => {
@@ -73,6 +75,7 @@ const getSavedChannel = (): FastChannel => {
 };
 
 export const LiveTVPage: React.FC = () => {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [currentChannel, setCurrentChannel] = useState<FastChannel>(getSavedChannel);
   const [schedule, setSchedule] = useState<ChannelSchedule | null>(null);
@@ -87,7 +90,40 @@ export const LiveTVPage: React.FC = () => {
   const playerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isNavigatingAwayRef = useRef(false); // Track if we're actually leaving the page
+  const scheduleRef = useRef<ChannelSchedule | null>(null); // Store schedule for cleanup
+  const channelRef = useRef<FastChannel>(currentChannel); // Store channel for cleanup
+  const dvrOffsetRef = useRef<number | null>(null); // Store DVR offset for cleanup
   const { enablePiP, disablePiP, isActive: isPiPActive } = usePiP();
+  const { playlists } = useLibrary();
+
+  // Convert user playlists to virtual FastChannel objects
+  const userChannels: FastChannel[] = useMemo(() => {
+    return playlists
+      .filter(p => p.videoIds.length > 0)
+      .map((playlist, index) => ({
+        id: `user-${playlist.id}`,
+        number: 90 + index, // User channels start at 90
+        name: playlist.title,
+        shortName: playlist.title.slice(0, 3).toUpperCase(),
+        description: playlist.description || 'Your personal playlist',
+        category: 'mixed' as const,
+        logo: '⭐',
+        color: playlist.color || '#c9a227',
+        videoIds: playlist.videoIds,
+        isLive: false,
+      }));
+  }, [playlists]);
+
+  // All channels including user channels
+  const allChannels = useMemo(() => {
+    return [...FAST_CHANNELS, ...userChannels];
+  }, [userChannels]);
+
+  // Keep refs in sync with state
+  scheduleRef.current = schedule;
+  channelRef.current = currentChannel;
+  dvrOffsetRef.current = dvrStartOffset;
 
   // Send command to YouTube player via postMessage (no reload needed)
   const sendPlayerCommand = useCallback((command: string, args?: unknown) => {
@@ -107,6 +143,41 @@ export const LiveTVPage: React.FC = () => {
       return newMuted;
     });
   }, [sendPlayerCommand]);
+
+  // Skip to next video in channel when current video is unavailable
+  const skipToNextVideo = useCallback(() => {
+    if (!schedule) return;
+    // Force update to next video by advancing the time check
+    const newSchedule = getChannelSchedule(currentChannel, INITIAL_VIDEOS);
+    if (newSchedule && newSchedule.nextVideo) {
+      setCurrentVideoId(newSchedule.nextVideo.id);
+      setInitialStartOffset(0);
+      setIsLive(true);
+      setDvrStartOffset(null);
+    }
+  }, [schedule, currentChannel]);
+
+  // Listen for YouTube player errors via postMessage
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Only handle YouTube messages
+      if (!event.origin.includes('youtube.com')) return;
+
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        // YouTube sends error codes: 2 (invalid param), 5 (HTML5 error), 100 (not found), 101/150 (embed disabled)
+        if (data.event === 'onError' || (data.info && data.info.playerState === -1)) {
+          console.log('YouTube video unavailable, skipping to next...');
+          skipToNextVideo();
+        }
+      } catch {
+        // Not a JSON message, ignore
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [skipToNextVideo]);
 
   // Auto-hide overlay logic
   const startHideTimer = useCallback(() => {
@@ -143,19 +214,37 @@ export const LiveTVPage: React.FC = () => {
 
   // Filter channels by category
   const filteredChannels = useMemo(() => {
+    // Handle My Channels category
+    if (selectedCategory === 'my-channels') {
+      return userChannels;
+    }
     const category = LIVE_TV_CATEGORIES.find(c => c.id === selectedCategory);
-    if (!category) return FAST_CHANNELS;
+    if (!category) return allChannels;
     return FAST_CHANNELS.filter(category.filter);
-  }, [selectedCategory]);
+  }, [selectedCategory, userChannels, allChannels]);
 
   // Convert live TV categories to sidebar format
   const sidebarCategories: SidebarCategory[] = useMemo(() => {
-    return LIVE_TV_CATEGORIES.map(cat => ({
+    const standardCategories = LIVE_TV_CATEGORIES.map(cat => ({
       id: cat.id,
       name: cat.name,
       count: FAST_CHANNELS.filter(cat.filter).length,
     }));
-  }, []);
+
+    // Add My Channels category if user has playlists with videos
+    if (userChannels.length > 0) {
+      return [
+        ...standardCategories,
+        {
+          id: 'my-channels',
+          name: 'My Channels',
+          count: userChannels.length,
+        },
+      ];
+    }
+
+    return standardCategories;
+  }, [userChannels]);
 
   // Track current video ID and its initial start offset to detect actual video changes
   const [currentVideoId, setCurrentVideoId] = useState<string | null>(null);
@@ -248,8 +337,14 @@ export const LiveTVPage: React.FC = () => {
   }, [currentChannel]);
 
   const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement && containerRef.current) {
-      containerRef.current.requestFullscreen();
+    // Use playerRef for fullscreen (just the video area, not whole page)
+    if (!document.fullscreenElement && playerRef.current) {
+      playerRef.current.requestFullscreen().catch(err => {
+        // Fallback to container if player fullscreen fails
+        if (containerRef.current) {
+          containerRef.current.requestFullscreen();
+        }
+      });
     } else if (document.fullscreenElement) {
       document.exitFullscreen();
     }
@@ -292,6 +387,37 @@ export const LiveTVPage: React.FC = () => {
     }
   }, [schedule, currentChannel, dvrStartOffset, enablePiP, isPiPActive]);
 
+  // Track when we're navigating away (not just switching channels)
+  useEffect(() => {
+    // When location changes (component unmounts from route change), set the flag
+    return () => {
+      isNavigatingAwayRef.current = true;
+    };
+  }, [location.pathname]);
+
+  // Auto-enable PiP when navigating away from Live TV page (not on channel switch)
+  useEffect(() => {
+    return () => {
+      // Only enable PiP if we're actually navigating away, not just switching channels
+      if (isNavigatingAwayRef.current && scheduleRef.current && !isPiPActive) {
+        const currentVideo = scheduleRef.current.currentVideo;
+        enablePiP({
+          videoId: currentVideo.id,
+          embedUrl: currentVideo.embedUrl,
+          title: currentVideo.title,
+          expert: currentVideo.expert,
+          thumbnail: currentVideo.thumbnail,
+          duration: currentVideo.duration,
+          startTime: dvrOffsetRef.current !== null ? dvrOffsetRef.current : Math.floor(scheduleRef.current.startOffset),
+          isLive: true,
+          channelId: channelRef.current.id,
+        });
+      }
+    };
+    // Run cleanup only on component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Memoize YouTube URL - does NOT include mute state (controlled via API)
   // Start parameter syncs playback to the "broadcast" position
   const videoUrl = useMemo(() => {
@@ -308,7 +434,7 @@ export const LiveTVPage: React.FC = () => {
     : 0;
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#0D0D12] pt-14">
+    <div ref={containerRef} className="bg-[#0D0D12] pt-14">
       <div className="flex">
         {/* Left Sidebar - Channel Categories - Hidden on mobile and in theater mode */}
         {!isTheaterMode && (
@@ -325,12 +451,12 @@ export const LiveTVPage: React.FC = () => {
 
         {/* Main Content - Full width on mobile and in theater mode */}
         <main className={`flex-1 transition-all duration-300 ${isTheaterMode ? 'ml-0' : 'ml-0 lg:ml-56'}`}>
-          {/* Video Player Section - Centered */}
-          <div className="relative bg-black">
-            <div className={`max-w-7xl mx-auto ${isTheaterMode ? '' : 'px-0 lg:px-4'}`}>
+          {/* Video Player Section - Sticky on mobile, Centered */}
+          <div className="sticky top-14 z-30 lg:relative lg:z-auto bg-black flex justify-center">
+            <div className={`w-full max-w-7xl ${isTheaterMode ? '' : 'px-0 lg:px-4'}`}>
               <div
                 ref={playerRef}
-                className={`aspect-video relative transition-all duration-300 ${isTheaterMode ? 'max-h-[80vh]' : 'max-h-[50vh]'}`}
+                className={`aspect-video relative transition-all duration-300 mx-auto ${isTheaterMode ? 'max-h-[80vh]' : 'max-h-[35vh] lg:max-h-[50vh]'}`}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={handleMouseMove}
               >
@@ -498,13 +624,20 @@ export const LiveTVPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Category Pills - Only on mobile */}
-          <div className="lg:hidden px-4 py-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {/* Mobile Category Pills - Sticky below player - Scrolls to section */}
+          <div className="lg:hidden sticky top-[calc(35vh+56px)] z-20 bg-[#0D0D12] px-4 py-3 overflow-x-auto border-b border-[#1E1E2E]" style={{ scrollbarWidth: 'none' }}>
             <div className="flex gap-2">
-              {LIVE_TV_CATEGORIES.map(cat => (
+              {LIVE_TV_CATEGORIES.filter(cat => cat.id !== 'all').map(cat => (
                 <button
                   key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    // Scroll to category section
+                    const element = document.getElementById(`mobile-category-${cat.id}`);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
                   className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedCategory === cat.id
                       ? 'bg-[#F5C518] text-black'
@@ -517,65 +650,85 @@ export const LiveTVPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Channel Guide - Pluto TV Style - Only on mobile */}
-          <div className="lg:hidden border-t border-[#1E1E2E]">
-            <div className="px-4 py-2 flex items-center justify-between text-sm">
+          {/* Mobile Channel Guide - Pluto TV Style - Shows ALL channels grouped by category */}
+          <div className="lg:hidden">
+            <div className="px-4 py-2 flex items-center justify-between text-sm border-b border-[#1E1E2E] bg-[#0D0D12]">
               <span className="text-white/60">Now - {new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>
               <span className="text-[#F5C518]">Next →</span>
             </div>
-            <div className="max-h-[40vh] overflow-y-auto">
-              {filteredChannels.map(channel => {
-                const channelSchedule = getChannelSchedule(channel, INITIAL_VIDEOS);
-                const isSelected = channel.id === currentChannel.id;
-                const timeLeft = channelSchedule ? Math.floor(channelSchedule.remaining / 60) : 0;
+            {/* Channel list - scrolls naturally with page */}
+            <div className="pb-4">
+              {LIVE_TV_CATEGORIES.filter(cat => cat.id !== 'all').map(category => {
+                const categoryChannels = FAST_CHANNELS.filter(category.filter);
+                if (categoryChannels.length === 0) return null;
 
                 return (
-                  <button
-                    key={channel.id}
-                    onClick={() => switchChannel(channel)}
-                    className={`w-full flex items-center gap-3 p-3 border-b border-[#1E1E2E] transition-colors ${
-                      isSelected ? 'bg-[#F5C518]/10 border-l-2 border-l-[#F5C518]' : 'hover:bg-[#1E1E2E]'
-                    }`}
-                  >
-                    {/* Channel Logo */}
-                    <div
-                      className="w-12 h-12 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ backgroundColor: channel.color + '30' }}
-                    >
-                      {channel.logo}
+                  <div key={category.id} id={`mobile-category-${category.id}`}>
+                    {/* Category Header */}
+                    <div className="px-4 py-2 bg-[#1A1A24] sticky top-0 z-10">
+                      <span className="text-[#F5C518] text-xs font-semibold uppercase tracking-wider">
+                        {category.name}
+                      </span>
                     </div>
+                    {/* Channels in this category */}
+                    {categoryChannels.map(channel => {
+                      const channelSchedule = getChannelSchedule(channel, INITIAL_VIDEOS);
+                      const isSelected = channel.id === currentChannel.id;
+                      const timeLeft = channelSchedule ? Math.floor(channelSchedule.remaining / 60) : 0;
 
-                    {/* Current Program */}
-                    <div className="flex-1 min-w-0 text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-medium truncate">
-                          {channelSchedule?.currentVideo.title || channel.name}
-                        </span>
-                        {isSelected && (
-                          <span className="px-1.5 py-0.5 bg-red-500 text-[10px] font-bold rounded">LIVE</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-white/50 text-xs">{timeLeft}m left</span>
-                        {/* Progress bar */}
-                        {channelSchedule && (
-                          <div className="flex-1 h-1 bg-[#2E2E3E] rounded-full overflow-hidden max-w-20">
-                            <div
-                              className="h-full bg-[#F5C518]"
-                              style={{
-                                width: `${((channelSchedule.currentVideo.duration - channelSchedule.remaining) / channelSchedule.currentVideo.duration) * 100}%`
-                              }}
-                            />
+                      return (
+                        <button
+                          key={channel.id}
+                          onClick={() => switchChannel(channel)}
+                          className={`w-full flex items-center gap-3 p-3 border-b border-[#1E1E2E] transition-colors ${
+                            isSelected ? 'bg-[#F5C518]/10 border-l-2 border-l-[#F5C518]' : 'hover:bg-[#1E1E2E]'
+                          }`}
+                        >
+                          {/* Channel Logo */}
+                          <div
+                            className="w-12 h-12 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+                            style={{ backgroundColor: channel.color + '30' }}
+                          >
+                            {channel.logo}
                           </div>
-                        )}
-                      </div>
-                    </div>
 
-                    {/* Next Program */}
-                    <div className="text-right text-xs text-white/40 flex-shrink-0 max-w-24">
-                      <div className="truncate">{channelSchedule?.nextVideo.title || 'Up next'}</div>
-                    </div>
-                  </button>
+                          {/* Channel Name & Current Program */}
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-2">
+                              <span className="text-white font-semibold truncate">
+                                {channel.name}
+                              </span>
+                              {isSelected && (
+                                <span className="px-1.5 py-0.5 bg-red-500 text-[10px] font-bold rounded">LIVE</span>
+                              )}
+                            </div>
+                            <div className="text-white/70 text-sm truncate">
+                              {channelSchedule?.currentVideo.title || 'Loading...'}
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-white/50 text-xs">{timeLeft}m left</span>
+                              {/* Progress bar */}
+                              {channelSchedule && (
+                                <div className="flex-1 h-1 bg-[#2E2E3E] rounded-full overflow-hidden max-w-20">
+                                  <div
+                                    className="h-full bg-[#F5C518]"
+                                    style={{
+                                      width: `${((channelSchedule.currentVideo.duration - channelSchedule.remaining) / channelSchedule.currentVideo.duration) * 100}%`
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Next Program */}
+                          <div className="text-right text-xs text-white/40 flex-shrink-0 max-w-24">
+                            <div className="truncate">{channelSchedule?.nextVideo.title || 'Up next'}</div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 );
               })}
             </div>

@@ -20,6 +20,7 @@ interface PiPState {
   currentTime: number;
   isPlaying: boolean;
   isMinimized: boolean;
+  isPaused: boolean; // Paused but not closed (e.g., when on Shorts page)
 }
 
 interface PiPContextType {
@@ -29,9 +30,12 @@ interface PiPContextType {
   currentTime: number;
   isPlaying: boolean;
   isMinimized: boolean;
+  isPaused: boolean;
   // Actions
   enablePiP: (videoData: PiPVideoData) => void;
   disablePiP: () => void;
+  pausePiP: () => void;
+  resumePiP: () => void;
   updateCurrentTime: (time: number) => void;
   setIsPlaying: (playing: boolean) => void;
   toggleMinimize: () => void;
@@ -50,6 +54,7 @@ export const PiPProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     currentTime: 0,
     isPlaying: false,
     isMinimized: false,
+    isPaused: false,
   });
 
   const enablePiP = useCallback((videoData: PiPVideoData) => {
@@ -73,8 +78,23 @@ export const PiPProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       currentTime: 0,
       isPlaying: false,
       isMinimized: false,
+      isPaused: false,
     });
   }, [state.video, state.currentTime, updateVideoProgress]);
+
+  // Pause PiP without closing (e.g., when entering Shorts page)
+  const pausePiP = useCallback(() => {
+    if (state.isActive) {
+      setState(prev => ({ ...prev, isPaused: true, isPlaying: false }));
+    }
+  }, [state.isActive]);
+
+  // Resume PiP from paused state
+  const resumePiP = useCallback(() => {
+    if (state.isActive && state.isPaused) {
+      setState(prev => ({ ...prev, isPaused: false, isPlaying: true }));
+    }
+  }, [state.isActive, state.isPaused]);
 
   const updateCurrentTime = useCallback((time: number) => {
     setState(prev => ({ ...prev, currentTime: time }));
@@ -104,6 +124,7 @@ export const PiPProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         currentTime: 0,
         isPlaying: false,
         isMinimized: false,
+        isPaused: false,
       });
 
       // Navigate to full player
@@ -123,8 +144,11 @@ export const PiPProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         currentTime: state.currentTime,
         isPlaying: state.isPlaying,
         isMinimized: state.isMinimized,
+        isPaused: state.isPaused,
         enablePiP,
         disablePiP,
+        pausePiP,
+        resumePiP,
         updateCurrentTime,
         setIsPlaying,
         toggleMinimize,

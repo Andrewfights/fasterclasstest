@@ -11,6 +11,8 @@ import {
   ArrowLeft,
   LogOut,
   Film,
+  PlaySquare,
+  FolderOpen,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -26,6 +28,8 @@ const navItems: NavItem[] = [
   { to: '/admin/episodes', icon: <Film className="w-5 h-5" />, label: 'Episodes' },
   { to: '/admin/courses', icon: <BookOpen className="w-5 h-5" />, label: 'Courses' },
   { to: '/admin/channels', icon: <Tv className="w-5 h-5" />, label: 'Channels' },
+  { to: '/admin/vod', icon: <PlaySquare className="w-5 h-5" />, label: 'VOD Manager' },
+  { to: '/admin/collections', icon: <FolderOpen className="w-5 h-5" />, label: 'Collections' },
   { to: '/admin/homepage', icon: <Home className="w-5 h-5" />, label: 'Homepage' },
   { to: '/admin/learn', icon: <GraduationCap className="w-5 h-5" />, label: 'Learning' },
   { to: '/admin/settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },

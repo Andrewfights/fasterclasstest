@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -14,6 +15,7 @@ import {
   Play,
   Scissors,
   Radio,
+  ExternalLink,
 } from 'lucide-react';
 import { Episode, EpisodeClip, Video, DistributionChannel } from '../../types';
 import { INITIAL_VIDEOS, getYoutubeId, formatDuration } from '../../constants';
@@ -37,6 +39,7 @@ const saveEpisodes = (episodes: Episode[]) => {
 };
 
 export const EpisodeManager: React.FC = () => {
+  const navigate = useNavigate();
   const [episodes, setEpisodes] = useState<Episode[]>(loadEpisodes);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -170,7 +173,14 @@ export const EpisodeManager: React.FC = () => {
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#2E2E3E] text-white rounded-lg hover:bg-[#3E3E4E] transition-colors"
                   >
                     <Edit className="w-4 h-4" />
-                    Edit
+                    Quick Edit
+                  </button>
+                  <button
+                    onClick={() => navigate(`/admin/episodes/${episode.id}`)}
+                    className="px-3 py-2 bg-[#2E2E3E] text-[#8B5CF6] rounded-lg hover:bg-[#8B5CF6]/20 transition-colors"
+                    title="Full editor"
+                  >
+                    <ExternalLink className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setDeleteConfirm(episode.id)}

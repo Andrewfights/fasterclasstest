@@ -22,10 +22,15 @@ import {
   MyListPage,
   ResourcesPage,
 } from './components/streaming';
+import { PlaylistManager } from './components/streaming/PlaylistManager';
+import { PlaylistDetailPage } from './components/streaming/PlaylistDetailPage';
 
 // VOD and Live TV components
 import { VODPage } from './components/vod';
 import { LiveTVPage } from './components/tv';
+
+// Details Page
+import { VideoDetailsPage } from './components/details/VideoDetailsPage';
 
 // Search
 import { SearchPage } from './components/search';
@@ -58,6 +63,10 @@ import {
   ChannelManager,
   HomepageEditor,
   EpisodeManager,
+  ChannelEditor,
+  EpisodeEditor,
+  VODManager,
+  CollectionEditor,
 } from './components/cms';
 
 // Playlist player wrapper with route params
@@ -247,8 +256,15 @@ function App() {
                   {/* Watch */}
                   <Route path="/watch/:videoId" element={<WatchPage />} />
 
+                  {/* Content Details */}
+                  <Route path="/details/:videoId" element={<VideoDetailsPage />} />
+
                   {/* Library */}
                   <Route path="/my-list" element={<MyListPage />} />
+
+                  {/* My Stuff - Playlist Management */}
+                  <Route path="/my-stuff" element={<PlaylistManager />} />
+                  <Route path="/my-stuff/:playlistId" element={<PlaylistDetailPage />} />
 
                   {/* On Demand (VOD) */}
                   <Route path="/vod" element={<VODPage />} />
@@ -296,8 +312,13 @@ function App() {
                     <Route index element={<CMSDashboard />} />
                     <Route path="videos" element={<VideoManager />} />
                     <Route path="episodes" element={<EpisodeManager />} />
+                    <Route path="episodes/:episodeId" element={<EpisodeEditor />} />
                     <Route path="courses" element={<CourseManager />} />
                     <Route path="channels" element={<ChannelManager />} />
+                    <Route path="channels/:channelId" element={<ChannelEditor />} />
+                    <Route path="vod" element={<VODManager />} />
+                    <Route path="collections" element={<VODManager />} />
+                    <Route path="collections/:collectionId" element={<CollectionEditor />} />
                     <Route path="homepage" element={<HomepageEditor />} />
                     <Route path="learn" element={<LearnPage />} />
                     <Route path="settings" element={

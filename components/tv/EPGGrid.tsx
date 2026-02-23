@@ -132,9 +132,9 @@ export const EPGGrid: React.FC<EPGGridProps> = ({
     <div className="bg-[#0D0D12]">
       {/* Header with time markers */}
       <div className="flex border-b border-[#1E1E2E]">
-        {/* Channel column header */}
-        <div className="w-52 flex-shrink-0 px-4 py-3 bg-[#0D0D12] border-r border-[#1E1E2E]">
-          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Program Guide</span>
+        {/* Channel column header - responsive width */}
+        <div className="w-32 sm:w-40 lg:w-52 flex-shrink-0 px-2 sm:px-4 py-3 bg-[#0D0D12] border-r border-[#1E1E2E]">
+          <span className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider">Now - 11:10 PM</span>
         </div>
 
         {/* Time header */}
@@ -187,24 +187,26 @@ export const EPGGrid: React.FC<EPGGridProps> = ({
                   isCurrentChannel ? 'bg-[#F5C518]/5' : 'hover:bg-[#1A1A24]/50'
                 }`}
               >
-                {/* Channel info */}
+                {/* Channel info - responsive width */}
                 <button
                   onClick={() => onChannelSelect(channel)}
-                  className="w-52 flex-shrink-0 px-4 py-3 flex items-center gap-3 text-left border-r border-[#1E1E2E] hover:bg-[#1E1E2E] transition-colors"
+                  className="w-32 sm:w-40 lg:w-52 flex-shrink-0 px-2 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-3 text-left border-r border-[#1E1E2E] hover:bg-[#1E1E2E] transition-colors"
                 >
-                  <div className="flex items-center gap-3 w-full">
-                    <span className="text-xs text-[#6B7280] font-medium w-6">{channel.number}</span>
+                  <div className="flex items-center gap-2 sm:gap-3 w-full">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-lg sm:text-xl flex-shrink-0"
                       style={{ backgroundColor: channel.color + '25' }}
                     >
                       {channel.logo}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="text-sm font-medium text-white block truncate">{channel.name}</span>
-                      {isCurrentChannel && (
-                        <span className="text-[10px] text-red-400 font-medium">NOW PLAYING</span>
-                      )}
+                      <span className="text-xs sm:text-sm font-medium text-white block truncate">{channel.name}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-[#6B7280]">CH {channel.number}</span>
+                        {isCurrentChannel && (
+                          <span className="text-[10px] text-red-400 font-medium ml-1">LIVE</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -259,7 +261,7 @@ export const EPGGrid: React.FC<EPGGridProps> = ({
               {/* Expanded program details */}
               {isExpanded && selectedSlot && (
                 <div className="bg-[#F5C518]/10 border-b border-[#F5C518]/30">
-                  <div className="flex p-4 gap-4 ml-52">
+                  <div className="flex flex-col sm:flex-row p-4 gap-4 ml-0 sm:ml-32 lg:ml-52">
                     {/* Thumbnail */}
                     <div className="w-48 flex-shrink-0">
                       <div className="aspect-video rounded-lg overflow-hidden">

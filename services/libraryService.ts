@@ -6,6 +6,7 @@ const getDefaultLibrary = (): UserLibrary => ({
   savedVideos: [],
   playlists: [],
   watchHistory: [],
+  favorites: [],
 });
 
 class LibraryService {
@@ -66,6 +67,42 @@ class LibraryService {
       return false;
     } else {
       this.saveVideo(videoId);
+      return true;
+    }
+  }
+
+  // Favorites
+  getFavorites(): string[] {
+    return [...(this.library.favorites || [])];
+  }
+
+  isFavorited(videoId: string): boolean {
+    return (this.library.favorites || []).includes(videoId);
+  }
+
+  addFavorite(videoId: string): void {
+    if (!this.library.favorites) {
+      this.library.favorites = [];
+    }
+    if (!this.library.favorites.includes(videoId)) {
+      this.library.favorites.push(videoId);
+      this.saveLibrary();
+    }
+  }
+
+  removeFavorite(videoId: string): void {
+    if (this.library.favorites) {
+      this.library.favorites = this.library.favorites.filter(id => id !== videoId);
+      this.saveLibrary();
+    }
+  }
+
+  toggleFavorite(videoId: string): boolean {
+    if (this.isFavorited(videoId)) {
+      this.removeFavorite(videoId);
+      return false;
+    } else {
+      this.addFavorite(videoId);
       return true;
     }
   }

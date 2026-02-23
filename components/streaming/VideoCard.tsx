@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Plus, Check } from 'lucide-react';
+import { Play, Plus, Check, Heart, ListVideo } from 'lucide-react';
 import { Video } from '../../types';
 import { formatDuration } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
+import { AddToPlaylistModal } from './AddToPlaylistModal';
 
 interface VideoCardProps {
   video: Video;
@@ -19,8 +20,10 @@ export const VideoCard: React.FC<VideoCardProps> = ({
   layout = 'horizontal',
 }) => {
   const navigate = useNavigate();
-  const { isVideoSaved, toggleSaveVideo, getVideoProgress } = useLibrary();
+  const { isVideoSaved, toggleSaveVideo, getVideoProgress, isFavorited, toggleFavorite } = useLibrary();
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const saved = isVideoSaved(video.id);
+  const favorited = isFavorited(video.id);
   const progress = getVideoProgress(video.id);
 
   const progressPercent = progress
@@ -34,6 +37,16 @@ export const VideoCard: React.FC<VideoCardProps> = ({
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleSaveVideo(video.id);
+  };
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(video.id);
+  };
+
+  const handleAddToPlaylist = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPlaylistModal(true);
   };
 
   // Width classes for horizontal layout
@@ -69,6 +82,17 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
           <button
+            onClick={handleFavorite}
+            className={`w-10 h-10 rounded-full border-2 flex items-center justify-center hover:scale-110 transition-transform ${
+              favorited
+                ? 'bg-red-500 border-red-500 text-white'
+                : 'border-white/70 text-white hover:border-white'
+            }`}
+            title={favorited ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart className={`w-4 h-4 ${favorited ? 'fill-white' : ''}`} />
+          </button>
+          <button
             onClick={handlePlay}
             className="w-12 h-12 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform"
           >
@@ -81,8 +105,16 @@ export const VideoCard: React.FC<VideoCardProps> = ({
                 ? 'bg-[#8B5CF6] border-[#8B5CF6] text-white'
                 : 'border-white/70 text-white hover:border-white'
             }`}
+            title={saved ? 'Remove from library' : 'Add to library'}
           >
             {saved ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={handleAddToPlaylist}
+            className="w-10 h-10 rounded-full border-2 border-white/70 text-white flex items-center justify-center hover:scale-110 hover:border-white transition-transform"
+            title="Add to playlist"
+          >
+            <ListVideo className="w-4 h-4" />
           </button>
         </div>
 
@@ -108,6 +140,13 @@ export const VideoCard: React.FC<VideoCardProps> = ({
             Watched
           </div>
         )}
+
+        {/* Favorited indicator */}
+        {favorited && (
+          <div className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full">
+            <Heart className="w-3 h-3 text-white fill-white" />
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -115,6 +154,14 @@ export const VideoCard: React.FC<VideoCardProps> = ({
         {video.title}
       </h3>
       <p className="text-[#6B7280] text-xs">{video.expert}</p>
+
+      {/* Add to Playlist Modal */}
+      {showPlaylistModal && (
+        <AddToPlaylistModal
+          videoId={video.id}
+          onClose={() => setShowPlaylistModal(false)}
+        />
+      )}
     </div>
   );
 };

@@ -9,13 +9,15 @@ import {
   BookOpen,
   FileQuestion,
   Clock,
+  FileText,
 } from 'lucide-react';
-import { CourseModule, Video, Course } from '../../types';
+import { CourseModule, Video, Course, UserHomeworkProgress } from '../../types';
 import { INITIAL_VIDEOS, GLOSSARY_TERMS, formatDuration } from '../../constants';
 import { INITIAL_QUIZZES } from '../../data/quizzes';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { useGamification } from '../../contexts/GamificationContext';
 import { ModuleProgressBar } from './ModuleProgressBar';
+import { getHomeworkById } from '../../data/homework';
 
 interface ModuleCardProps {
   module: CourseModule;
@@ -56,6 +58,69 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
         .filter(Boolean),
     [module.keyTermIds]
   );
+
+  // Get homework assignment
+  const homework = useMemo(
+    () => module.homeworkId ? getHomeworkById(module.homeworkId) : null,
+    [module.homeworkId]
+  );
+
+  // Homework progress state (stored locally for now)
+  const [homeworkProgress, setHomeworkProgress] = useState<UserHomeworkProgress | null>(() => {
+    if (!homework) return null;
+    const stored = localStorage.getItem(`homework_progress_${homework.id}`);
+    return stored ? JSON.parse(stored) : null;
+  });
+
+  const [isHomeworkExpanded, setIsHomeworkExpanded] = useState(false);
+
+  const handleToggleHomeworkItem = (itemId: string) => {
+    if (!homework) return;
+
+    const currentProgress = homeworkProgress || {
+      assignmentId: homework.id,
+      completedItems: [],
+      startedAt: Date.now(),
+    };
+
+    const isCompleted = currentProgress.completedItems.includes(itemId);
+    const newCompletedItems = isCompleted
+      ? currentProgress.completedItems.filter(id => id !== itemId)
+      : [...currentProgress.completedItems, itemId];
+
+    const newProgress = {
+      ...currentProgress,
+      completedItems: newCompletedItems,
+    };
+
+    setHomeworkProgress(newProgress);
+    localStorage.setItem(`homework_progress_${homework.id}`, JSON.stringify(newProgress));
+  };
+
+  const handleUpdateHomeworkNotes = (notes: string) => {
+    if (!homework || !homeworkProgress) return;
+
+    const newProgress = {
+      ...homeworkProgress,
+      notes,
+    };
+
+    setHomeworkProgress(newProgress);
+    localStorage.setItem(`homework_progress_${homework.id}`, JSON.stringify(newProgress));
+  };
+
+  const handleCompleteHomework = () => {
+    if (!homework || !homeworkProgress) return;
+
+    const newProgress = {
+      ...homeworkProgress,
+      completedAt: Date.now(),
+    };
+
+    setHomeworkProgress(newProgress);
+    localStorage.setItem(`homework_progress_${homework.id}`, JSON.stringify(newProgress));
+    // TODO: Award XP through gamification context
+  };
 
   // Calculate progress
   const videosWatched = videos.filter(v => {
@@ -280,6 +345,113 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
                   Study
                 </span>
               </button>
+            </div>
+          )}
+
+          {/* Homework section */}
+          {homework && (
+            <div>
+              <h4 className="text-sm font-medium text-[#9CA3AF] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Homework
+              </h4>
+              <div
+                className={`bg-[#0D0D12] rounded-lg overflow-hidden border transition-colors ${
+                  homeworkProgress?.completedAt
+                    ? 'border-green-500/30'
+                    : 'border-transparent'
+                }`}
+              >
+                <button
+                  onClick={() => setIsHomeworkExpanded(!isHomeworkExpanded)}
+                  className="w-full p-3 flex items-center justify-between hover:bg-[#13131A] transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        homeworkProgress?.completedAt
+                          ? 'bg-green-500/20 text-green-500'
+                          : 'bg-[#c9a227]/20 text-[#c9a227]'
+                      }`}
+                    >
+                      <FileText className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-white">{homework.title}</p>
+                      <p className="text-xs text-[#6B7280]">
+                        {homeworkProgress?.completedItems?.length || 0}/{homework.actionItems.length} tasks • {homework.xpReward} XP
+                      </p>
+                    </div>
+                  </div>
+                  {homeworkProgress?.completedAt ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-green-500 font-medium">Completed</span>
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    </div>
+                  ) : (
+                    <ChevronDown className={`w-5 h-5 text-[#6B7280] transition-transform ${isHomeworkExpanded ? 'rotate-180' : ''}`} />
+                  )}
+                </button>
+
+                {/* Expanded homework content */}
+                {isHomeworkExpanded && (
+                  <div className="px-3 pb-3 border-t border-[#1E1E2E]">
+                    <p className="text-sm text-[#9CA3AF] py-3">{homework.description}</p>
+                    <div className="space-y-2">
+                      {homework.actionItems.map(item => {
+                        const isCompleted = homeworkProgress?.completedItems?.includes(item.id) || false;
+                        return (
+                          <div
+                            key={item.id}
+                            className={`flex items-start gap-3 p-2 rounded-lg ${
+                              isCompleted ? 'bg-green-500/10' : 'bg-[#13131A]'
+                            }`}
+                          >
+                            <button
+                              onClick={() => handleToggleHomeworkItem(item.id)}
+                              className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors ${
+                                isCompleted
+                                  ? 'bg-green-500 text-white'
+                                  : 'border-2 border-[#4E4E5E] hover:border-[#c9a227]'
+                              }`}
+                            >
+                              {isCompleted && <CheckCircle className="w-3 h-3" />}
+                            </button>
+                            <div className="flex-1">
+                              <p className={`text-xs ${isCompleted ? 'text-green-400 line-through' : 'text-white'}`}>
+                                {item.task}
+                              </p>
+                              {item.hint && !isCompleted && (
+                                <p className="text-xs text-[#6B7280] mt-1 italic">{item.hint}</p>
+                              )}
+                            </div>
+                            {!item.isRequired && (
+                              <span className="px-1.5 py-0.5 bg-[#2E2E3E] rounded text-[10px] text-[#6B7280]">
+                                Optional
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Complete button */}
+                    {!homeworkProgress?.completedAt && (
+                      <button
+                        onClick={handleCompleteHomework}
+                        disabled={
+                          !homework.actionItems
+                            .filter(i => i.isRequired)
+                            .every(i => homeworkProgress?.completedItems?.includes(i.id))
+                        }
+                        className="w-full mt-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Complete & Earn {homework.xpReward} XP
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

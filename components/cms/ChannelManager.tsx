@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Tv,
   Plus,
@@ -16,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
+  ExternalLink,
 } from 'lucide-react';
 import { FAST_CHANNELS, INITIAL_VIDEOS } from '../../constants';
 import { FastChannel, Video, ScheduleBlock } from '../../types';
@@ -52,6 +54,7 @@ interface ScheduleBlockUI extends ScheduleBlock {
 }
 
 export const ChannelManager: React.FC = () => {
+  const navigate = useNavigate();
   const [channels] = useState<FastChannel[]>(FAST_CHANNELS);
   const [selectedChannel, setSelectedChannel] = useState<FastChannel | null>(null);
   const [scheduleMode, setScheduleMode] = useState<'auto' | 'custom'>('auto');
@@ -255,29 +258,42 @@ export const ChannelManager: React.FC = () => {
           </div>
           <div className="divide-y divide-[#2E2E3E] max-h-[600px] overflow-y-auto">
             {channels.map(channel => (
-              <button
+              <div
                 key={channel.id}
-                onClick={() => setSelectedChannel(channel)}
-                className={`w-full p-4 flex items-center gap-3 transition-colors text-left ${
+                className={`p-4 flex items-center gap-3 transition-colors group ${
                   selectedChannel?.id === channel.id
                     ? 'bg-[#8B5CF6]/20'
                     : 'hover:bg-[#1E1E2E]'
                 }`}
               >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
-                  style={{ backgroundColor: channel.color + '30' }}
+                <button
+                  onClick={() => setSelectedChannel(channel)}
+                  className="flex items-center gap-3 flex-1 min-w-0 text-left"
                 >
-                  {channel.logo}
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                    style={{ backgroundColor: channel.color + '30' }}
+                  >
+                    {channel.logo}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-white truncate">{channel.name}</p>
+                    <p className="text-xs text-[#6B7280]">Ch. {channel.number}</p>
+                  </div>
+                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#6B7280]">
+                    {channel.videoIds.length} videos
+                  </span>
+                  <button
+                    onClick={() => navigate(`/admin/channels/${channel.id}`)}
+                    className="p-1.5 rounded-lg text-[#6B7280] hover:text-white hover:bg-[#2E2E3E] opacity-0 group-hover:opacity-100 transition-all"
+                    title="Edit channel"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white truncate">{channel.name}</p>
-                  <p className="text-xs text-[#6B7280]">Ch. {channel.number}</p>
-                </div>
-                <div className="text-xs text-[#6B7280]">
-                  {channel.videoIds.length} videos
-                </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
@@ -309,6 +325,13 @@ export const ChannelManager: React.FC = () => {
                     {hasChanges && (
                       <span className="text-amber-500 text-sm">Unsaved changes</span>
                     )}
+                    <button
+                      onClick={() => navigate(`/admin/channels/${selectedChannel.id}`)}
+                      className="px-3 py-2 text-sm text-[#9CA3AF] hover:text-white transition-colors flex items-center gap-2"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit Channel
+                    </button>
                     <button
                       onClick={handleReset}
                       className="px-3 py-2 text-sm text-[#9CA3AF] hover:text-white transition-colors flex items-center gap-2"

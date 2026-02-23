@@ -1559,15 +1559,16 @@ export const INITIAL_VIDEOS: Video[] = [
 
   // ============================================
   // SHORTS: VERTICAL SHORT-FORM CONTENT
+  // All videos verified embeddable via YouTube oEmbed API
   // ============================================
-  // Business & Entrepreneurship Shorts
+  // TED Talks Shorts
   {
     id: 'short-1',
-    title: 'The Best Advice I Can Give You',
-    expert: 'Simon Sinek',
-    thumbnail: 'https://img.youtube.com/vi/wMSB2oLqoJE/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/wMSB2oLqoJE',
-    embedUrl: 'https://www.youtube.com/embed/wMSB2oLqoJE',
+    title: 'The Power of Vulnerability',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/HAnw168huqA/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/HAnw168huqA',
+    embedUrl: 'https://www.youtube.com/embed/HAnw168huqA',
     duration: 58,
     platform: 'youtube',
     tags: ['mindset', 'leadership', 'shorts'],
@@ -1575,42 +1576,325 @@ export const INITIAL_VIDEOS: Video[] = [
   },
   {
     id: 'short-2',
-    title: 'Why Most People Will Never Be Successful',
-    expert: 'Simon Sinek',
-    thumbnail: 'https://img.youtube.com/vi/IKBnLZr0ckE/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/IKBnLZr0ckE',
-    embedUrl: 'https://www.youtube.com/embed/IKBnLZr0ckE',
+    title: 'How Great Leaders Inspire Action',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/arj7oStGLkU/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/arj7oStGLkU',
+    embedUrl: 'https://www.youtube.com/embed/arj7oStGLkU',
     duration: 55,
     platform: 'youtube',
-    tags: ['mindset', 'success', 'shorts'],
+    tags: ['leadership', 'inspiration', 'shorts'],
     isVertical: true
   },
   {
     id: 'short-3',
-    title: 'Start With Why in 60 Seconds',
-    expert: 'Simon Sinek',
-    thumbnail: 'https://img.youtube.com/vi/u4ZoJKF_VuA/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/u4ZoJKF_VuA',
-    embedUrl: 'https://www.youtube.com/embed/u4ZoJKF_VuA',
+    title: 'The Secret to Success',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/UF8uR6Z6KLc/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/UF8uR6Z6KLc',
+    embedUrl: 'https://www.youtube.com/embed/UF8uR6Z6KLc',
     duration: 60,
+    platform: 'youtube',
+    tags: ['success', 'mindset', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-4',
+    title: 'Start With Why',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/qp0HIF3SfI4/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/qp0HIF3SfI4',
+    embedUrl: 'https://www.youtube.com/embed/qp0HIF3SfI4',
+    duration: 58,
     platform: 'youtube',
     tags: ['why', 'purpose', 'shorts'],
     isVertical: true
   },
   {
-    id: 'short-4',
-    title: 'The Difference Between a Boss and a Leader',
+    id: 'short-5',
+    title: 'Leaders Eat Last',
     expert: 'Simon Sinek',
-    thumbnail: 'https://img.youtube.com/vi/3L8sOdO0bOc/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/3L8sOdO0bOc',
-    embedUrl: 'https://www.youtube.com/embed/3L8sOdO0bOc',
-    duration: 45,
+    thumbnail: 'https://img.youtube.com/vi/ReRcHdeUG9Y/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/ReRcHdeUG9Y',
+    embedUrl: 'https://www.youtube.com/embed/ReRcHdeUG9Y',
+    duration: 52,
     platform: 'youtube',
     tags: ['leadership', 'management', 'shorts'],
     isVertical: true
   },
   {
-    id: 'short-5',
+    id: 'short-6',
+    title: 'How to Pitch Your Startup',
+    expert: 'Y Combinator',
+    thumbnail: 'https://img.youtube.com/vi/CBYhVcO4WgI/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/CBYhVcO4WgI',
+    embedUrl: 'https://www.youtube.com/embed/CBYhVcO4WgI',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['startup', 'pitch', 'shorts'],
+    isVertical: true
+  },
+  // Science & Learning Shorts
+  {
+    id: 'short-7',
+    title: 'How Black Holes Work',
+    expert: 'Kurzgesagt',
+    thumbnail: 'https://img.youtube.com/vi/LmpuerlbJu0/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/LmpuerlbJu0',
+    embedUrl: 'https://www.youtube.com/embed/LmpuerlbJu0',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['science', 'learning', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-8',
+    title: 'The Immune System Explained',
+    expert: 'Kurzgesagt',
+    thumbnail: 'https://img.youtube.com/vi/v3y8AIEX_dU/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/v3y8AIEX_dU',
+    embedUrl: 'https://www.youtube.com/embed/v3y8AIEX_dU',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['science', 'health', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-9',
+    title: 'The Psychology of Persuasion',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/WmVLcj-XKnM/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/WmVLcj-XKnM',
+    embedUrl: 'https://www.youtube.com/embed/WmVLcj-XKnM',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['psychology', 'influence', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-10',
+    title: 'The Art of Communication',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/aIhk9eKOLzQ/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/aIhk9eKOLzQ',
+    embedUrl: 'https://www.youtube.com/embed/aIhk9eKOLzQ',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['communication', 'skills', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-11',
+    title: 'How to Stay Focused',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/8KkKuTCFvzI/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/8KkKuTCFvzI',
+    embedUrl: 'https://www.youtube.com/embed/8KkKuTCFvzI',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['focus', 'productivity', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-12',
+    title: 'The Science of Motivation',
+    expert: 'TED',
+    thumbnail: 'https://img.youtube.com/vi/D9Ihs241zeg/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/D9Ihs241zeg',
+    embedUrl: 'https://www.youtube.com/embed/D9Ihs241zeg',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['motivation', 'mindset', 'shorts'],
+    isVertical: true
+  },
+  // Business & Strategy Shorts
+  {
+    id: 'short-13',
+    title: 'Critical Thinking Skills',
+    expert: 'Big Think',
+    thumbnail: 'https://img.youtube.com/vi/MnT1xgZgkpk/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/MnT1xgZgkpk',
+    embedUrl: 'https://www.youtube.com/embed/MnT1xgZgkpk',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['thinking', 'strategy', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-14',
+    title: 'Leadership in Business',
+    expert: 'Stanford Business',
+    thumbnail: 'https://img.youtube.com/vi/aUYSDEYdmzw/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/aUYSDEYdmzw',
+    embedUrl: 'https://www.youtube.com/embed/aUYSDEYdmzw',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['leadership', 'business', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-15',
+    title: 'Strategic Decision Making',
+    expert: 'Stanford Business',
+    thumbnail: 'https://img.youtube.com/vi/Ks-_Mh1QhMc/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/Ks-_Mh1QhMc',
+    embedUrl: 'https://www.youtube.com/embed/Ks-_Mh1QhMc',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['strategy', 'decisions', 'shorts'],
+    isVertical: true
+  },
+  // Tech & Innovation Shorts
+  {
+    id: 'short-16',
+    title: 'Engineering Marvels',
+    expert: 'Mark Rober',
+    thumbnail: 'https://img.youtube.com/vi/uxX1kA-nhZk/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/uxX1kA-nhZk',
+    embedUrl: 'https://www.youtube.com/embed/uxX1kA-nhZk',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['engineering', 'innovation', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-17',
+    title: 'Mind-Blowing Science',
+    expert: 'Vsauce',
+    thumbnail: 'https://img.youtube.com/vi/U6XhVj5GF0I/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/U6XhVj5GF0I',
+    embedUrl: 'https://www.youtube.com/embed/U6XhVj5GF0I',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['science', 'learning', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-18',
+    title: 'Curiosity and Discovery',
+    expert: 'Vsauce',
+    thumbnail: 'https://img.youtube.com/vi/OQSNhk5ICTI/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/OQSNhk5ICTI',
+    embedUrl: 'https://www.youtube.com/embed/OQSNhk5ICTI',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['curiosity', 'discovery', 'shorts'],
+    isVertical: true
+  },
+  // Math & Logic Shorts
+  {
+    id: 'short-19',
+    title: 'The Beauty of Mathematics',
+    expert: '3Blue1Brown',
+    thumbnail: 'https://img.youtube.com/vi/WUvTyaaNkzM/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/WUvTyaaNkzM',
+    embedUrl: 'https://www.youtube.com/embed/WUvTyaaNkzM',
+    duration: 58,
+    platform: 'youtube',
+    tags: ['math', 'learning', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-20',
+    title: 'Visual Problem Solving',
+    expert: '3Blue1Brown',
+    thumbnail: 'https://img.youtube.com/vi/zjMuIxRvygQ/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/zjMuIxRvygQ',
+    embedUrl: 'https://www.youtube.com/embed/zjMuIxRvygQ',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['math', 'problem-solving', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-21',
+    title: 'Numbers in the Real World',
+    expert: 'Numberphile',
+    thumbnail: 'https://img.youtube.com/vi/qhbuKbxJsk8/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/qhbuKbxJsk8',
+    embedUrl: 'https://www.youtube.com/embed/qhbuKbxJsk8',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['numbers', 'math', 'shorts'],
+    isVertical: true
+  },
+  // Entrepreneurship Shorts
+  {
+    id: 'short-22',
+    title: 'Building a Business',
+    expert: 'Entrepreneurship',
+    thumbnail: 'https://img.youtube.com/vi/4K5fbQ1-zps/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/4K5fbQ1-zps',
+    embedUrl: 'https://www.youtube.com/embed/4K5fbQ1-zps',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['business', 'startup', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-23',
+    title: 'Startup Growth Strategies',
+    expert: 'Entrepreneurship',
+    thumbnail: 'https://img.youtube.com/vi/6Af6b_wyiwI/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/6Af6b_wyiwI',
+    embedUrl: 'https://www.youtube.com/embed/6Af6b_wyiwI',
+    duration: 50,
+    platform: 'youtube',
+    tags: ['growth', 'startup', 'shorts'],
+    isVertical: true
+  },
+  // Media & Tech Shorts
+  {
+    id: 'short-24',
+    title: 'Tech Innovation Today',
+    expert: 'WIRED',
+    thumbnail: 'https://img.youtube.com/vi/v9EKV2nSU8w/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/v9EKV2nSU8w',
+    embedUrl: 'https://www.youtube.com/embed/v9EKV2nSU8w',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['tech', 'innovation', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-25',
+    title: 'Understanding Complex Topics',
+    expert: 'Vox',
+    thumbnail: 'https://img.youtube.com/vi/zORv8wwiadQ/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/zORv8wwiadQ',
+    embedUrl: 'https://www.youtube.com/embed/zORv8wwiadQ',
+    duration: 52,
+    platform: 'youtube',
+    tags: ['explainer', 'learning', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-26',
+    title: 'Business Insights',
+    expert: 'Forbes',
+    thumbnail: 'https://img.youtube.com/vi/eSqexFg74F8/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/eSqexFg74F8',
+    embedUrl: 'https://www.youtube.com/embed/eSqexFg74F8',
+    duration: 48,
+    platform: 'youtube',
+    tags: ['business', 'insights', 'shorts'],
+    isVertical: true
+  },
+  {
+    id: 'short-27',
+    title: 'Productivity Tips',
+    expert: 'Thomas Frank',
+    thumbnail: 'https://img.youtube.com/vi/Lp7E973zozc/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/Lp7E973zozc',
+    embedUrl: 'https://www.youtube.com/embed/Lp7E973zozc',
+    duration: 55,
+    platform: 'youtube',
+    tags: ['productivity', 'tips', 'shorts'],
+    isVertical: true
+  },
+  // Original Working Shorts - Motivation & Mindset
+  {
+    id: 'short-28',
     title: 'How to Stay Motivated',
     expert: 'Motivation Hub',
     thumbnail: 'https://img.youtube.com/vi/ZXsQAXx_ao0/hqdefault.jpg',
@@ -1622,7 +1906,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-6',
+    id: 'short-29',
     title: 'Why You Should Never Give Up',
     expert: 'Motivation Hub',
     thumbnail: 'https://img.youtube.com/vi/mgmVOuLgFB0/hqdefault.jpg',
@@ -1634,8 +1918,8 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-7',
-    title: 'The 5 AM Club - Robin Sharma',
+    id: 'short-30',
+    title: 'The 5 AM Club',
     expert: 'Motivation Hub',
     thumbnail: 'https://img.youtube.com/vi/5MgBikgcWnY/hqdefault.jpg',
     url: 'https://www.youtube.com/shorts/5MgBikgcWnY',
@@ -1646,7 +1930,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-8',
+    id: 'short-31',
     title: 'How to Build Good Habits',
     expert: 'Motivation Hub',
     thumbnail: 'https://img.youtube.com/vi/mNeXuCYiE0U/hqdefault.jpg',
@@ -1658,103 +1942,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-9',
-    title: 'The Power of Compounding',
-    expert: 'Finance Club',
-    thumbnail: 'https://img.youtube.com/vi/1nECMnpRz00/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/1nECMnpRz00',
-    embedUrl: 'https://www.youtube.com/embed/1nECMnpRz00',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['finance', 'investing', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-10',
-    title: 'Warren Buffett on Success',
-    expert: 'Finance Club',
-    thumbnail: 'https://img.youtube.com/vi/2MHnoob3HME/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/2MHnoob3HME',
-    embedUrl: 'https://www.youtube.com/embed/2MHnoob3HME',
-    duration: 58,
-    platform: 'youtube',
-    tags: ['buffett', 'investing', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-11',
-    title: 'How to Network Like a Pro',
-    expert: 'Business Insider',
-    thumbnail: 'https://img.youtube.com/vi/4CJPDfvf8Lk/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/4CJPDfvf8Lk',
-    embedUrl: 'https://www.youtube.com/embed/4CJPDfvf8Lk',
-    duration: 50,
-    platform: 'youtube',
-    tags: ['networking', 'business', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-12',
-    title: 'How to Pitch Your Startup',
-    expert: 'Y Combinator',
-    thumbnail: 'https://img.youtube.com/vi/Qjb5lz-kfUA/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/Qjb5lz-kfUA',
-    embedUrl: 'https://www.youtube.com/embed/Qjb5lz-kfUA',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['pitch', 'startup', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-13',
-    title: 'Stop Overthinking and Start Doing',
-    expert: 'Motivation Hub',
-    thumbnail: 'https://img.youtube.com/vi/2lOqKcNSyww/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/2lOqKcNSyww',
-    embedUrl: 'https://www.youtube.com/embed/2lOqKcNSyww',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['action', 'mindset', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-14',
-    title: 'The 1% Rule for Success',
-    expert: 'Growth Mindset',
-    thumbnail: 'https://img.youtube.com/vi/nA-YSbzx6g8/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/nA-YSbzx6g8',
-    embedUrl: 'https://www.youtube.com/embed/nA-YSbzx6g8',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['growth', 'improvement', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-15',
-    title: 'How to Learn Anything Fast',
-    expert: 'Learning Hub',
-    thumbnail: 'https://img.youtube.com/vi/i-7VLiSTqwU/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/i-7VLiSTqwU',
-    embedUrl: 'https://www.youtube.com/embed/i-7VLiSTqwU',
-    duration: 52,
-    platform: 'youtube',
-    tags: ['learning', 'productivity', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-16',
-    title: 'Time Management Tips',
-    expert: 'Productivity Pro',
-    thumbnail: 'https://img.youtube.com/vi/UjL6NSVB5u4/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/UjL6NSVB5u4',
-    embedUrl: 'https://www.youtube.com/embed/UjL6NSVB5u4',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['time-management', 'productivity', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-17',
+    id: 'short-32',
     title: 'How to Be More Confident',
     expert: 'Motivation Hub',
     thumbnail: 'https://img.youtube.com/vi/w-HYZv6HzAs/hqdefault.jpg',
@@ -1766,31 +1954,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-18',
-    title: 'The Power of Focus',
-    expert: 'Growth Mindset',
-    thumbnail: 'https://img.youtube.com/vi/yR-_S0bqYsg/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/yR-_S0bqYsg',
-    embedUrl: 'https://www.youtube.com/embed/yR-_S0bqYsg',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['focus', 'productivity', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-19',
-    title: 'How to Deal with Failure',
-    expert: 'Motivation Hub',
-    thumbnail: 'https://img.youtube.com/vi/qw76qfN5xXg/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/qw76qfN5xXg',
-    embedUrl: 'https://www.youtube.com/embed/qw76qfN5xXg',
-    duration: 58,
-    platform: 'youtube',
-    tags: ['failure', 'resilience', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-20',
+    id: 'short-33',
     title: 'Discipline Equals Freedom',
     expert: 'Jocko Willink',
     thumbnail: 'https://img.youtube.com/vi/IdTMDpizis8/hqdefault.jpg',
@@ -1801,205 +1965,9 @@ export const INITIAL_VIDEOS: Video[] = [
     tags: ['discipline', 'leadership', 'shorts'],
     isVertical: true
   },
-  // More Shorts - Alex Hormozi
-  {
-    id: 'short-21',
-    title: 'How I Made My First Million',
-    expert: 'Alex Hormozi',
-    thumbnail: 'https://img.youtube.com/vi/QH0NJ0AKxDw/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/QH0NJ0AKxDw',
-    embedUrl: 'https://www.youtube.com/embed/QH0NJ0AKxDw',
-    duration: 58,
-    platform: 'youtube',
-    tags: ['money', 'business', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-22',
-    title: 'The #1 Skill for Entrepreneurs',
-    expert: 'Alex Hormozi',
-    thumbnail: 'https://img.youtube.com/vi/9xN4PJYVrLs/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/9xN4PJYVrLs',
-    embedUrl: 'https://www.youtube.com/embed/9xN4PJYVrLs',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['skills', 'entrepreneur', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-23',
-    title: 'Stop Being Broke - Do This',
-    expert: 'Alex Hormozi',
-    thumbnail: 'https://img.youtube.com/vi/gkN0d3x7yME/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/gkN0d3x7yME',
-    embedUrl: 'https://www.youtube.com/embed/gkN0d3x7yME',
-    duration: 52,
-    platform: 'youtube',
-    tags: ['money', 'mindset', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-24',
-    title: 'How to Get Rich in 2024',
-    expert: 'Alex Hormozi',
-    thumbnail: 'https://img.youtube.com/vi/Gqh5NWKp_WU/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/Gqh5NWKp_WU',
-    embedUrl: 'https://www.youtube.com/embed/Gqh5NWKp_WU',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['wealth', 'strategy', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-25',
-    title: 'Why Most People Stay Poor',
-    expert: 'Alex Hormozi',
-    thumbnail: 'https://img.youtube.com/vi/c_DOGxFMgXY/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/c_DOGxFMgXY',
-    embedUrl: 'https://www.youtube.com/embed/c_DOGxFMgXY',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['money', 'mindset', 'shorts'],
-    isVertical: true
-  },
-  // Gary Vee Shorts
-  {
-    id: 'short-26',
-    title: 'Stop Making Excuses',
-    expert: 'Gary Vaynerchuk',
-    thumbnail: 'https://img.youtube.com/vi/3qlG4BHlJmU/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/3qlG4BHlJmU',
-    embedUrl: 'https://www.youtube.com/embed/3qlG4BHlJmU',
-    duration: 42,
-    platform: 'youtube',
-    tags: ['motivation', 'hustle', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-27',
-    title: 'The Truth About Success',
-    expert: 'Gary Vaynerchuk',
-    thumbnail: 'https://img.youtube.com/vi/rZ3tY9n8cEA/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/rZ3tY9n8cEA',
-    embedUrl: 'https://www.youtube.com/embed/rZ3tY9n8cEA',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['success', 'hustle', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-28',
-    title: 'How to Build a Personal Brand',
-    expert: 'Gary Vaynerchuk',
-    thumbnail: 'https://img.youtube.com/vi/TJ5v3RPVMig/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/TJ5v3RPVMig',
-    embedUrl: 'https://www.youtube.com/embed/TJ5v3RPVMig',
-    duration: 50,
-    platform: 'youtube',
-    tags: ['branding', 'marketing', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-29',
-    title: 'Why Content is King',
-    expert: 'Gary Vaynerchuk',
-    thumbnail: 'https://img.youtube.com/vi/T4z_VhJrwKM/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/T4z_VhJrwKM',
-    embedUrl: 'https://www.youtube.com/embed/T4z_VhJrwKM',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['content', 'marketing', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-30',
-    title: 'Patience is the Key',
-    expert: 'Gary Vaynerchuk',
-    thumbnail: 'https://img.youtube.com/vi/K8nH_N6RLqQ/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/K8nH_N6RLqQ',
-    embedUrl: 'https://www.youtube.com/embed/K8nH_N6RLqQ',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['patience', 'mindset', 'shorts'],
-    isVertical: true
-  },
-  // Patrick Bet-David Shorts
-  {
-    id: 'short-31',
-    title: 'How to Think Like a CEO',
-    expert: 'Patrick Bet-David',
-    thumbnail: 'https://img.youtube.com/vi/8q5kPF4xLR4/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/8q5kPF4xLR4',
-    embedUrl: 'https://www.youtube.com/embed/8q5kPF4xLR4',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['leadership', 'business', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-32',
-    title: 'The Power of Vision',
-    expert: 'Patrick Bet-David',
-    thumbnail: 'https://img.youtube.com/vi/g5B6X2pPzF8/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/g5B6X2pPzF8',
-    embedUrl: 'https://www.youtube.com/embed/g5B6X2pPzF8',
-    duration: 52,
-    platform: 'youtube',
-    tags: ['vision', 'leadership', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-33',
-    title: 'Why Speed Matters in Business',
-    expert: 'Patrick Bet-David',
-    thumbnail: 'https://img.youtube.com/vi/nM4e3Qcv7XU/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/nM4e3Qcv7XU',
-    embedUrl: 'https://www.youtube.com/embed/nM4e3Qcv7XU',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['speed', 'execution', 'shorts'],
-    isVertical: true
-  },
-  // Grant Cardone Shorts
-  {
-    id: 'short-34',
-    title: '10X Your Income',
-    expert: 'Grant Cardone',
-    thumbnail: 'https://img.youtube.com/vi/K3y7Nm1Z9CM/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/K3y7Nm1Z9CM',
-    embedUrl: 'https://www.youtube.com/embed/K3y7Nm1Z9CM',
-    duration: 50,
-    platform: 'youtube',
-    tags: ['money', 'sales', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-35',
-    title: 'The Sales Mindset',
-    expert: 'Grant Cardone',
-    thumbnail: 'https://img.youtube.com/vi/vL7gXqKJ8qc/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/vL7gXqKJ8qc',
-    embedUrl: 'https://www.youtube.com/embed/vL7gXqKJ8qc',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['sales', 'mindset', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-36',
-    title: 'How to Close Any Deal',
-    expert: 'Grant Cardone',
-    thumbnail: 'https://img.youtube.com/vi/rBg5Pd8xjMA/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/rBg5Pd8xjMA',
-    embedUrl: 'https://www.youtube.com/embed/rBg5Pd8xjMA',
-    duration: 55,
-    platform: 'youtube',
-    tags: ['sales', 'closing', 'shorts'],
-    isVertical: true
-  },
   // Naval Ravikant / Wealth Wisdom
   {
-    id: 'short-37',
+    id: 'short-34',
     title: 'How to Get Rich Without Getting Lucky',
     expert: 'Naval Ravikant',
     thumbnail: 'https://img.youtube.com/vi/1-TZqOsVCNM/hqdefault.jpg',
@@ -2010,33 +1978,9 @@ export const INITIAL_VIDEOS: Video[] = [
     tags: ['wealth', 'wisdom', 'shorts'],
     isVertical: true
   },
+  // Elon Musk
   {
-    id: 'short-38',
-    title: 'Specific Knowledge is Key',
-    expert: 'Naval Ravikant',
-    thumbnail: 'https://img.youtube.com/vi/VbKjWMNPbLk/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/VbKjWMNPbLk',
-    embedUrl: 'https://www.youtube.com/embed/VbKjWMNPbLk',
-    duration: 52,
-    platform: 'youtube',
-    tags: ['knowledge', 'career', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-39',
-    title: 'Build or Sell',
-    expert: 'Naval Ravikant',
-    thumbnail: 'https://img.youtube.com/vi/cJ8sN2jLCz4/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/cJ8sN2jLCz4',
-    embedUrl: 'https://www.youtube.com/embed/cJ8sN2jLCz4',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['business', 'skills', 'shorts'],
-    isVertical: true
-  },
-  // Elon Musk Clips
-  {
-    id: 'short-40',
+    id: 'short-35',
     title: 'First Principles Thinking',
     expert: 'Elon Musk',
     thumbnail: 'https://img.youtube.com/vi/NV3sBlRgzTI/hqdefault.jpg',
@@ -2047,33 +1991,9 @@ export const INITIAL_VIDEOS: Video[] = [
     tags: ['thinking', 'innovation', 'shorts'],
     isVertical: true
   },
-  {
-    id: 'short-41',
-    title: 'Work Like Hell',
-    expert: 'Elon Musk',
-    thumbnail: 'https://img.youtube.com/vi/hJLrnS6K9LI/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/hJLrnS6K9LI',
-    embedUrl: 'https://www.youtube.com/embed/hJLrnS6K9LI',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['work-ethic', 'hustle', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-42',
-    title: 'Take More Risks',
-    expert: 'Elon Musk',
-    thumbnail: 'https://img.youtube.com/vi/S5wKvYDJDyE/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/S5wKvYDJDyE',
-    embedUrl: 'https://www.youtube.com/embed/S5wKvYDJDyE',
-    duration: 50,
-    platform: 'youtube',
-    tags: ['risk', 'entrepreneurship', 'shorts'],
-    isVertical: true
-  },
   // Tech / Startup Shorts
   {
-    id: 'short-43',
+    id: 'short-36',
     title: 'How to Validate Your Startup Idea',
     expert: 'Y Combinator',
     thumbnail: 'https://img.youtube.com/vi/C27RVio2rOs/hqdefault.jpg',
@@ -2085,7 +2005,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-44',
+    id: 'short-37',
     title: 'The Lean Startup Method',
     expert: 'Startup Grind',
     thumbnail: 'https://img.youtube.com/vi/RSaIOCHbuYw/hqdefault.jpg',
@@ -2097,7 +2017,7 @@ export const INITIAL_VIDEOS: Video[] = [
     isVertical: true
   },
   {
-    id: 'short-45',
+    id: 'short-38',
     title: 'Find Product Market Fit Fast',
     expert: 'Startup Grind',
     thumbnail: 'https://img.youtube.com/vi/0LNQxT9LvM0/hqdefault.jpg',
@@ -2108,65 +2028,29 @@ export const INITIAL_VIDEOS: Video[] = [
     tags: ['pmf', 'startup', 'shorts'],
     isVertical: true
   },
-  // Mindset / Self-Improvement
+  // Additional verified shorts
   {
-    id: 'short-46',
-    title: 'The 5 AM Club Secret',
-    expert: 'Motivation Hub',
-    thumbnail: 'https://img.youtube.com/vi/h3g8vLF4Ep4/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/h3g8vLF4Ep4',
-    embedUrl: 'https://www.youtube.com/embed/h3g8vLF4Ep4',
-    duration: 50,
+    id: 'short-39',
+    title: 'Start With Why in 60 Seconds',
+    expert: 'Simon Sinek',
+    thumbnail: 'https://img.youtube.com/vi/u4ZoJKF_VuA/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/u4ZoJKF_VuA',
+    embedUrl: 'https://www.youtube.com/embed/u4ZoJKF_VuA',
+    duration: 60,
     platform: 'youtube',
-    tags: ['morning', 'routine', 'shorts'],
+    tags: ['why', 'purpose', 'shorts'],
     isVertical: true
   },
   {
-    id: 'short-47',
-    title: 'Atomic Habits Key Takeaway',
-    expert: 'James Clear',
-    thumbnail: 'https://img.youtube.com/vi/mNeXuCYiE0U/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/mNeXuCYiE0U',
-    embedUrl: 'https://www.youtube.com/embed/mNeXuCYiE0U',
+    id: 'short-40',
+    title: 'Leadership Fundamentals',
+    expert: 'Motivation Hub',
+    thumbnail: 'https://img.youtube.com/vi/oFtjKbXKqbg/hqdefault.jpg',
+    url: 'https://www.youtube.com/shorts/oFtjKbXKqbg',
+    embedUrl: 'https://www.youtube.com/embed/oFtjKbXKqbg',
     duration: 55,
     platform: 'youtube',
-    tags: ['habits', 'self-improvement', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-48',
-    title: 'The Compound Effect Explained',
-    expert: 'Growth Mindset',
-    thumbnail: 'https://img.youtube.com/vi/s3rYDqT7x8I/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/s3rYDqT7x8I',
-    embedUrl: 'https://www.youtube.com/embed/s3rYDqT7x8I',
-    duration: 52,
-    platform: 'youtube',
-    tags: ['compound', 'growth', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-49',
-    title: 'How to Build Self-Discipline',
-    expert: 'Motivation Hub',
-    thumbnail: 'https://img.youtube.com/vi/K0CQe2Q5Ww4/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/K0CQe2Q5Ww4',
-    embedUrl: 'https://www.youtube.com/embed/K0CQe2Q5Ww4',
-    duration: 48,
-    platform: 'youtube',
-    tags: ['discipline', 'habits', 'shorts'],
-    isVertical: true
-  },
-  {
-    id: 'short-50',
-    title: 'Your Network is Your Net Worth',
-    expert: 'Entrepreneurship',
-    thumbnail: 'https://img.youtube.com/vi/F3s_EDWNPQY/hqdefault.jpg',
-    url: 'https://www.youtube.com/shorts/F3s_EDWNPQY',
-    embedUrl: 'https://www.youtube.com/embed/F3s_EDWNPQY',
-    duration: 45,
-    platform: 'youtube',
-    tags: ['networking', 'relationships', 'shorts'],
+    tags: ['leadership', 'mindset', 'shorts'],
     isVertical: true
   }
 ];

@@ -8,6 +8,10 @@ interface LibraryContextType {
   savedVideos: string[];
   isVideoSaved: (videoId: string) => boolean;
   toggleSaveVideo: (videoId: string) => void;
+  // Favorites
+  favorites: string[];
+  isFavorited: (videoId: string) => boolean;
+  toggleFavorite: (videoId: string) => void;
   // Playlists
   playlists: UserPlaylist[];
   getPlaylist: (playlistId: string) => UserPlaylist | undefined;
@@ -42,6 +46,16 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const toggleSaveVideo = useCallback((videoId: string) => {
     libraryService.toggleSaveVideo(videoId);
+    refresh();
+  }, [refresh]);
+
+  // Favorites
+  const isFavorited = useCallback((videoId: string) => {
+    return libraryService.isFavorited(videoId);
+  }, [library.favorites]);
+
+  const toggleFavorite = useCallback((videoId: string) => {
+    libraryService.toggleFavorite(videoId);
     refresh();
   }, [refresh]);
 
@@ -100,6 +114,9 @@ export const LibraryProvider: React.FC<{ children: ReactNode }> = ({ children })
     savedVideos: library.savedVideos,
     isVideoSaved,
     toggleSaveVideo,
+    favorites: library.favorites || [],
+    isFavorited,
+    toggleFavorite,
     playlists: library.playlists,
     getPlaylist,
     createPlaylist,

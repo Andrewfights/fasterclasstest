@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Share2, Bookmark, ChevronUp, ChevronDown, X, Play, Volume2, VolumeX } from 'lucide-react';
 import { INITIAL_VIDEOS, formatDuration } from '../../constants';
 import { filterValidVideos } from '../../services/videoValidationService';
+import { usePiP } from '../../contexts/PiPContext';
 
 type Category = 'all' | 'mindset' | 'business' | 'motivation' | 'startup';
 
@@ -16,6 +17,7 @@ const CATEGORIES: { id: Category; label: string }[] = [
 
 export const VerticalFeed: React.FC = () => {
   const navigate = useNavigate();
+  const { isActive: isPiPActive, pausePiP, resumePiP, isPaused: wasPiPPaused } = usePiP();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [isPlaying, setIsPlaying] = useState(true);
@@ -23,6 +25,23 @@ export const VerticalFeed: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number>(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const pipWasActiveRef = useRef(false);
+
+  // Pause PiP when entering Shorts, resume when leaving
+  useEffect(() => {
+    if (isPiPActive && !wasPiPPaused) {
+      pipWasActiveRef.current = true;
+      pausePiP();
+    }
+
+    return () => {
+      // Resume PiP when leaving Shorts (if it was active)
+      if (pipWasActiveRef.current) {
+        resumePiP();
+        pipWasActiveRef.current = false;
+      }
+    };
+  }, [isPiPActive, wasPiPPaused, pausePiP, resumePiP]);
 
   // Get validated shorts videos
   const shortsVideos = useMemo(() => {

@@ -34,7 +34,7 @@ const Navigation: React.FC = () => {
   const watchMenuRef = useRef<HTMLDivElement>(null);
 
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + '/');
-  const isWatchActive = isActive('/vod') || isActive('/live');
+  const isWatchActive = isActive('/vod') || isActive('/live') || isActive('/feed');
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -64,11 +64,14 @@ const Navigation: React.FC = () => {
   // Mobile bottom nav items (5 sections)
   const mobileNavItems = [
     { path: '/', label: 'Home', icon: Home },
-    { path: 'watch', label: 'Watch', icon: MonitorPlay, isWatch: true },
-    { path: '/feed', label: 'Shorts', icon: Clapperboard },
     { path: '/courses', label: 'Courses', icon: BookOpen, matchAlso: '/course' },
+    { path: 'watch', label: 'Watch', icon: MonitorPlay, isWatch: true },
+    { path: '/games', label: 'Arcade', icon: Gamepad2 },
     { path: '/learn', label: 'Learn', icon: GraduationCap, matchAlso: '/learn' },
   ];
+
+  // Check if any watch-related path is active
+  const isWatchRelatedActive = isActive('/vod') || isActive('/live') || isActive('/feed');
 
   return (
     <>
@@ -284,8 +287,8 @@ const Navigation: React.FC = () => {
         </div>
       </nav>
 
-      {/* Mobile Bottom Navigation Bar - Premium Design */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0A0F18]/80 backdrop-blur-[12px] border-t border-white/5 pb-safe">
+      {/* Mobile & Tablet Bottom Navigation Bar - Premium Design */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0A0F18]/80 backdrop-blur-[12px] border-t border-white/5 pb-safe">
         <div className="flex items-center justify-around h-16 px-2">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
@@ -319,17 +322,17 @@ const Navigation: React.FC = () => {
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-[#111827] rounded-xl border border-white/10 shadow-modal overflow-hidden">
                       <button
                         onClick={() => {
-                          navigate('/vod');
+                          navigate('/feed');
                           setWatchMenuOpen(false);
                         }}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-[180ms] ${
-                          isActive('/vod')
+                          isActive('/feed')
                             ? 'bg-gradient-to-r from-[#FACC15]/20 to-[#F59E0B]/20 text-[#FACC15]'
                             : 'text-white/90 hover:bg-[#1C2433]'
                         }`}
                       >
-                        <Play className="w-5 h-5" />
-                        <span className="font-semibold">VOD</span>
+                        <Clapperboard className="w-5 h-5" />
+                        <span className="font-semibold">Shorts</span>
                       </button>
                       <button
                         onClick={() => {
@@ -350,6 +353,20 @@ const Navigation: React.FC = () => {
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                           </span>
                         </div>
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigate('/vod');
+                          setWatchMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-[180ms] ${
+                          isActive('/vod')
+                            ? 'bg-gradient-to-r from-[#FACC15]/20 to-[#F59E0B]/20 text-[#FACC15]'
+                            : 'text-white/90 hover:bg-[#1C2433]'
+                        }`}
+                      >
+                        <Play className="w-5 h-5" />
+                        <span className="font-semibold">VOD</span>
                       </button>
                     </div>
                   )}
@@ -377,8 +394,8 @@ const Navigation: React.FC = () => {
         </div>
       </nav>
 
-      {/* Spacer for mobile bottom nav */}
-      <div className="md:hidden h-16" />
+      {/* Spacer for mobile/tablet bottom nav */}
+      <div className="lg:hidden h-16" />
     </>
   );
 };

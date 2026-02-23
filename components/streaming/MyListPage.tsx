@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Bookmark, Clock, Trash2, Edit2, X } from 'lucide-react';
+import { Plus, Bookmark, Clock, Trash2, Edit2, X, Heart } from 'lucide-react';
 import { INITIAL_VIDEOS, formatDuration } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { VideoCard } from './VideoCard';
@@ -11,6 +11,7 @@ export const MyListPage: React.FC = () => {
     savedVideos,
     playlists,
     continueWatching,
+    favorites,
     createPlaylist,
     deletePlaylist,
     updatePlaylist,
@@ -30,6 +31,11 @@ export const MyListPage: React.FC = () => {
   // Get video objects for continue watching
   const continueWatchingVideos = continueWatching
     .map(h => INITIAL_VIDEOS.find(v => v.id === h.videoId))
+    .filter(Boolean) as typeof INITIAL_VIDEOS;
+
+  // Get video objects for favorites
+  const favoritedVideos = favorites
+    .map(id => INITIAL_VIDEOS.find(v => v.id === id))
     .filter(Boolean) as typeof INITIAL_VIDEOS;
 
   const handleCreatePlaylist = () => {
@@ -72,6 +78,22 @@ export const MyListPage: React.FC = () => {
             Your bookmarked sessions and curated playlists.
           </p>
         </div>
+
+        {/* Favorites */}
+        {favoritedVideos.length > 0 && (
+          <section className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+              <h2 className="text-2xl font-bold text-white">Favorites</h2>
+              <span className="text-[#6B7280]">({favoritedVideos.length})</span>
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+              {favoritedVideos.map(video => (
+                <VideoCard key={video.id} video={video} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Continue Watching */}
         {continueWatchingVideos.length > 0 && (
