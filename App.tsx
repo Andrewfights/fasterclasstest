@@ -11,6 +11,7 @@ import { LibraryProvider } from './contexts/LibraryContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { PiPProvider } from './contexts/PiPContext';
 import { PiPPlayer } from './components/PiPPlayer';
+import { ScrollToTop } from './components/ScrollToTop';
 import { dataService } from './services/dataService';
 
 // Streaming components
@@ -229,6 +230,7 @@ function App() {
     <ThemeProvider>
       <LibraryProvider>
         <PiPProvider>
+        <ScrollToTop />
         <div className="min-h-screen bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] font-sans">
         <Routes>
           {/* Full-screen player route - no navigation bar */}

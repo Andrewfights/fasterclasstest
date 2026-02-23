@@ -64,6 +64,7 @@ export const PiPProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       currentTime: videoData.startTime || 0,
       isPlaying: true,
       isMinimized: false,
+      isPaused: false,
     });
   }, []);
 

@@ -94,6 +94,8 @@ export const LiveTVPage: React.FC = () => {
   const scheduleRef = useRef<ChannelSchedule | null>(null); // Store schedule for cleanup
   const channelRef = useRef<FastChannel>(currentChannel); // Store channel for cleanup
   const dvrOffsetRef = useRef<number | null>(null); // Store DVR offset for cleanup
+  const enablePiPRef = useRef(enablePiP); // Store enablePiP for cleanup
+  const isPiPActiveRef = useRef(isPiPActive); // Store isPiPActive for cleanup
   const { enablePiP, disablePiP, isActive: isPiPActive } = usePiP();
   const { playlists } = useLibrary();
 
@@ -124,6 +126,8 @@ export const LiveTVPage: React.FC = () => {
   scheduleRef.current = schedule;
   channelRef.current = currentChannel;
   dvrOffsetRef.current = dvrStartOffset;
+  enablePiPRef.current = enablePiP;
+  isPiPActiveRef.current = isPiPActive;
 
   // Send command to YouTube player via postMessage (no reload needed)
   const sendPlayerCommand = useCallback((command: string, args?: unknown) => {
@@ -399,9 +403,10 @@ export const LiveTVPage: React.FC = () => {
   useEffect(() => {
     return () => {
       // Only enable PiP if we're actually navigating away, not just switching channels
-      if (isNavigatingAwayRef.current && scheduleRef.current && !isPiPActive) {
+      // Use refs to get current values at cleanup time
+      if (isNavigatingAwayRef.current && scheduleRef.current && !isPiPActiveRef.current) {
         const currentVideo = scheduleRef.current.currentVideo;
-        enablePiP({
+        enablePiPRef.current({
           videoId: currentVideo.id,
           embedUrl: currentVideo.embedUrl,
           title: currentVideo.title,

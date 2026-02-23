@@ -21,12 +21,14 @@ export const WatchPage: React.FC = () => {
   const currentTimeRef = useRef<number>(0);
   const videoRef = useRef<typeof video>(null);
   const isPiPActiveRef = useRef(false);
+  const enablePiPRef = useRef(enablePiP);
 
   const video = INITIAL_VIDEOS.find(v => v.id === videoId);
 
   // Keep refs in sync
   videoRef.current = video;
   isPiPActiveRef.current = isPiPActive;
+  enablePiPRef.current = enablePiP;
   const saved = videoId ? isVideoSaved(videoId) : false;
   const progress = videoId ? getVideoProgress(videoId) : undefined;
 
@@ -153,7 +155,7 @@ export const WatchPage: React.FC = () => {
       // Use refs to get current values at cleanup time
       const currentVideo = videoRef.current;
       if (currentVideo && !isPiPActiveRef.current) {
-        enablePiP({
+        enablePiPRef.current({
           videoId: currentVideo.id,
           embedUrl: currentVideo.embedUrl,
           title: currentVideo.title,
