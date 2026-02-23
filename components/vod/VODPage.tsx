@@ -4,7 +4,7 @@ import { ChevronRight, ChevronLeft } from 'lucide-react';
 import { CategorySidebar, SidebarCategory } from '../shared/CategorySidebar';
 import { VOD_CATEGORIES, INITIAL_VIDEOS, formatDuration } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
-import { Video } from '../../types';
+import { Video, HeroCarouselItem } from '../../types';
 import { HeroCarousel } from './HeroCarousel';
 
 export const VODPage: React.FC = () => {
@@ -82,7 +82,9 @@ export const VODPage: React.FC = () => {
           {/* Hero Carousel for Featured */}
           {selectedCategory === 'featured' && (
             <div className="mb-8">
-              <HeroCarousel videos={selectedVideos.slice(0, 8)} />
+              <HeroCarousel
+                items={selectedVideos.slice(0, 8).map(v => ({ type: 'video', item: v }))}
+              />
             </div>
           )}
 

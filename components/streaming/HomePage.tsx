@@ -1,43 +1,34 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, CheckCircle, Clock, TrendingUp, Smartphone, Monitor, ChevronRight, Sparkles, Zap, Trophy, BookOpen, Star } from 'lucide-react';
+import { Play, CheckCircle, Clock, TrendingUp, Smartphone, Monitor, ChevronRight, Sparkles, BookOpen } from 'lucide-react';
 import { ContentRow } from './ContentRow';
 import { CourseCard } from './CourseCard';
 import { VideoCard } from './VideoCard';
+import { HeroCarousel } from '../vod/HeroCarousel';
 import { COURSES, INITIAL_VIDEOS } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { useGamification } from '../../contexts/GamificationContext';
-
-// Marquee item types
-interface MarqueeItem {
-  type: 'progress' | 'video' | 'course' | 'news' | 'achievement';
-  title: string;
-  subtitle?: string;
-  icon: string;
-  color: string;
-  link?: string;
-}
+import { HeroCarouselItem } from '../../types';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { continueWatching, savedVideos } = useLibrary();
   const { level, levelDefinition, progress } = useGamification();
   const [videoLayout, setVideoLayout] = useState<'horizontal' | 'vertical'>('horizontal');
-  const marqueeRef = useRef<HTMLDivElement>(null);
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Marquee items - dynamic based on user progress
-  const marqueeItems: MarqueeItem[] = [
-    { type: 'progress', title: `Level ${level}`, subtitle: levelDefinition.title, icon: '🚀', color: levelDefinition.color },
-    { type: 'news', title: 'New Course', subtitle: 'AI for Founders', icon: '🤖', color: '#8B5CF6' },
-    { type: 'achievement', title: `${progress.achievements.length} Achievements`, subtitle: 'Unlocked', icon: '🏆', color: '#FFD700' },
-    { type: 'video', title: 'Trending Now', subtitle: 'YC Application Tips', icon: '🔥', color: '#FF6B35' },
-    { type: 'course', title: '14 Courses', subtitle: 'Available', icon: '📚', color: '#22C55E' },
-    { type: 'news', title: 'Feature Drop', subtitle: 'Certificates', icon: '🎓', color: '#06B6D4' },
+  // Hero carousel items - mix of featured videos and courses
+  const heroCarouselItems: HeroCarouselItem[] = [
+    { type: 'video', item: INITIAL_VIDEOS[0] },
+    { type: 'course', item: COURSES[0] },
+    { type: 'video', item: INITIAL_VIDEOS[4] },
+    { type: 'course', item: COURSES[1] },
+    { type: 'video', item: INITIAL_VIDEOS[8] },
+    { type: 'course', item: COURSES[2] },
   ];
 
   // Get vertical videos
@@ -58,36 +49,13 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0D0D12]">
-      {/* Scrolling Marquee */}
-      <div className="pt-16 bg-gradient-to-b from-[#1a1a2e] to-transparent">
-        <div className="overflow-hidden py-3 border-b border-[#2E2E3E]/50">
-          <div
-            ref={marqueeRef}
-            className="flex gap-6 animate-marquee whitespace-nowrap"
-            style={{
-              animation: 'marquee 30s linear infinite',
-            }}
-          >
-            {[...marqueeItems, ...marqueeItems].map((item, idx) => (
-              <div
-                key={idx}
-                className="flex items-center gap-3 px-4 py-2 bg-[#1E1E2E]/80 rounded-full border border-[#2E2E3E] hover:border-[#8B5CF6]/50 transition-colors cursor-pointer"
-              >
-                <span className="text-xl">{item.icon}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-white font-medium text-sm">{item.title}</span>
-                  {item.subtitle && (
-                    <span className="text-[#9CA3AF] text-xs">{item.subtitle}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Hero Carousel */}
+      <div className="pt-16">
+        <HeroCarousel items={heroCarouselItems} autoPlayInterval={8000} />
       </div>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 px-4">
+      <section className="relative pt-12 pb-16 px-4">
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a2e]/30 via-transparent to-transparent pointer-events-none" />
 
@@ -182,20 +150,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Add marquee animation styles */}
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-marquee {
-          animation: marquee 30s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
 
       {/* Feature Cards */}
       <section className="py-12 px-4 border-t border-[#1E1E2E]">

@@ -389,3 +389,17 @@ export interface AuditLogEntry {
   timestamp: number;
   userId?: string;
 }
+
+// === HERO CAROUSEL TYPES ===
+
+export interface HeroCarouselVideoItem {
+  type: 'video';
+  item: Video;
+}
+
+export interface HeroCarouselCourseItem {
+  type: 'course';
+  item: Course;
+}
+
+export type HeroCarouselItem = HeroCarouselVideoItem | HeroCarouselCourseItem;
