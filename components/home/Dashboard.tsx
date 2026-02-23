@@ -10,6 +10,7 @@ import {
   Trophy,
   PlayCircle,
   Gamepad2,
+  Smartphone,
 } from 'lucide-react';
 import { useGamification } from '../../contexts/GamificationContext';
 import { useLibrary } from '../../contexts/LibraryContext';
@@ -65,9 +66,16 @@ export const Dashboard: React.FC = () => {
     // For now, just return popular videos not in continue watching
     const watchedIds = new Set(continueWatching.map(h => h.videoId));
     return INITIAL_VIDEOS
-      .filter(v => !watchedIds.has(v.id))
+      .filter(v => !watchedIds.has(v.id) && !v.isVertical)
       .slice(0, 10);
   }, [continueWatching]);
+
+  // Get shorts videos for the shorts section
+  const shortsVideos = useMemo(() => {
+    return INITIAL_VIDEOS
+      .filter(v => v.isVertical === true)
+      .slice(0, 12);
+  }, []);
 
   // Get featured channels with current video
   const featuredChannels = useMemo(() => {
@@ -271,6 +279,56 @@ export const Dashboard: React.FC = () => {
             <p className="text-sm text-[#9CA3AF]">Best Grind</p>
           </div>
         </div>
+
+        {/* Shorts Section */}
+        <section className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Smartphone className="w-5 h-5 text-[#FF0000]" />
+              Quick Hits
+            </h2>
+            <Link
+              to="/vod"
+              className="text-sm text-[#c9a227] hover:text-[#d4af37] transition-colors flex items-center gap-1"
+            >
+              View All Shorts <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none' }}>
+            {shortsVideos.map(video => (
+              <button
+                key={video.id}
+                onClick={() => navigate(`/watch/${video.id}`)}
+                className="flex-shrink-0 w-28 sm:w-32 group"
+              >
+                <div className="relative aspect-[9/16] rounded-xl overflow-hidden mb-2 bg-[#1E1E2E]">
+                  <img
+                    src={video.thumbnail}
+                    alt={video.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 rounded text-[10px] text-white">
+                    {formatDuration(video.duration)}
+                  </div>
+                  <div className="absolute top-2 left-2 p-1.5 bg-[#FF0000]/90 rounded-full">
+                    <Smartphone className="w-3 h-3 text-white" />
+                  </div>
+                  {/* Play overlay on hover */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                      <Play className="w-4 h-4 text-black fill-black ml-0.5" />
+                    </div>
+                  </div>
+                </div>
+                <h3 className="text-xs font-medium text-white line-clamp-2 group-hover:text-[#c9a227] transition-colors">
+                  {video.title}
+                </h3>
+                <p className="text-[10px] text-[#6B7280] mt-0.5">{video.expert}</p>
+              </button>
+            ))}
+          </div>
+        </section>
 
         {/* Recommended Videos */}
         <section className="mb-10">
