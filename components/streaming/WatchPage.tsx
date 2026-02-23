@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Check, Clock, User, RotateCcw, PictureInPicture2 } from 'lucide-react';
+import { ArrowLeft, Plus, Check, Clock, User, RotateCcw, PictureInPicture2, AlertTriangle, SkipForward } from 'lucide-react';
 import { INITIAL_VIDEOS, formatDuration, COURSES, getYoutubeId } from '../../constants';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { usePiP } from '../../contexts/PiPContext';
 import { VideoCard } from './VideoCard';
+import { reportVideoError, filterValidVideos } from '../../services/videoValidationService';
 
 export const WatchPage: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
@@ -15,6 +16,8 @@ export const WatchPage: React.FC = () => {
   const { enablePiP, disablePiP, isActive: isPiPActive, video: pipVideo } = usePiP();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [watchFromStart, setWatchFromStart] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [errorRetryCount, setErrorRetryCount] = useState(0);
   const currentTimeRef = useRef<number>(0);
 
   const video = INITIAL_VIDEOS.find(v => v.id === videoId);
@@ -37,13 +40,37 @@ export const WatchPage: React.FC = () => {
   const resumeTime = watchFromStart ? 0 : (urlResumeTime ? parseInt(urlResumeTime) : savedResumeTime);
   const hasProgress = savedResumeTime > 10; // Only show restart if more than 10 seconds watched
 
-  // Find related videos (same tags or from same course)
+  // Find related videos (same tags or from same course) - filtered for valid videos
   const relatedVideos = video
-    ? INITIAL_VIDEOS.filter(v =>
+    ? filterValidVideos(INITIAL_VIDEOS.filter(v =>
         v.id !== video.id &&
         v.tags.some(tag => video.tags.includes(tag))
-      ).slice(0, 6)
+      )).slice(0, 6)
     : [];
+
+  // Handle video error - report and offer to skip
+  const handleVideoError = useCallback(() => {
+    if (video && !videoError) {
+      setVideoError(true);
+      reportVideoError(video.id, video.embedUrl);
+      console.warn(`Video failed to load: ${video.id} - ${video.title}`);
+    }
+  }, [video, videoError]);
+
+  // Skip to next available video
+  const handleSkipToNext = useCallback(() => {
+    if (relatedVideos.length > 0) {
+      navigate(`/watch/${relatedVideos[0].id}`);
+    } else {
+      navigate('/vod');
+    }
+  }, [relatedVideos, navigate]);
+
+  // Reset error state when video changes
+  useEffect(() => {
+    setVideoError(false);
+    setErrorRetryCount(0);
+  }, [videoId]);
 
   // Find which course this video belongs to
   const course = video
@@ -141,15 +168,45 @@ export const WatchPage: React.FC = () => {
             </button>
           )}
 
-          <iframe
-            ref={iframeRef}
-            key={`${videoId}-${watchFromStart}`}
-            src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}`}
-            title={video.title}
-            className="w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          {videoError ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A24]">
+              <div className="text-center px-6">
+                <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">Video Unavailable</h3>
+                <p className="text-[#9CA3AF] mb-6 max-w-md">
+                  This video cannot be played. It may have been removed or embedding is disabled.
+                </p>
+                <div className="flex items-center justify-center gap-3">
+                  {relatedVideos.length > 0 && (
+                    <button
+                      onClick={handleSkipToNext}
+                      className="flex items-center gap-2 px-6 py-3 bg-[#c9a227] text-black font-semibold rounded-xl hover:bg-[#d4af37] transition-colors"
+                    >
+                      <SkipForward className="w-5 h-5" />
+                      Watch Next
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate('/vod')}
+                    className="px-6 py-3 bg-[#2E2E3E] text-white font-semibold rounded-xl hover:bg-[#3E3E4E] transition-colors"
+                  >
+                    Browse Videos
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <iframe
+              ref={iframeRef}
+              key={`${videoId}-${watchFromStart}-${errorRetryCount}`}
+              src={`${video.embedUrl}?autoplay=1&rel=0&start=${resumeTime}`}
+              title={video.title}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              onError={handleVideoError}
+            />
+          )}
         </div>
       </div>
 

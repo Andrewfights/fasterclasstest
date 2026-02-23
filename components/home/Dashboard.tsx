@@ -16,6 +16,7 @@ import { useGamification } from '../../contexts/GamificationContext';
 import { useLibrary } from '../../contexts/LibraryContext';
 import { gamificationService } from '../../services/gamificationService';
 import { INITIAL_VIDEOS, FAST_CHANNELS, COURSES, formatDuration } from '../../constants';
+import { filterValidVideos } from '../../services/videoValidationService';
 import { FastChannel, Video, HeroCarouselItem } from '../../types';
 import { HeroCarousel } from '../vod/HeroCarousel';
 
@@ -51,39 +52,42 @@ export const Dashboard: React.FC = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Get all valid videos
+  const validVideos = useMemo(() => filterValidVideos(INITIAL_VIDEOS), []);
+
   // Get continue watching video
   const continueVideo = useMemo(() => {
     if (continueWatching.length === 0) return null;
     const historyItem = continueWatching[0];
-    const video = INITIAL_VIDEOS.find(v => v.id === historyItem.videoId);
+    const video = validVideos.find(v => v.id === historyItem.videoId);
     if (!video) return null;
     const progressPercent = Math.round((historyItem.timestamp / video.duration) * 100);
     return { video, progress: progressPercent, timestamp: historyItem.timestamp };
-  }, [continueWatching]);
+  }, [continueWatching, validVideos]);
 
   // Get recommended videos (based on tags from watched videos)
   const recommendedVideos = useMemo(() => {
     // For now, just return popular videos not in continue watching
     const watchedIds = new Set(continueWatching.map(h => h.videoId));
-    return INITIAL_VIDEOS
+    return validVideos
       .filter(v => !watchedIds.has(v.id) && !v.isVertical)
       .slice(0, 10);
-  }, [continueWatching]);
+  }, [continueWatching, validVideos]);
 
   // Get shorts videos for the shorts section
   const shortsVideos = useMemo(() => {
-    return INITIAL_VIDEOS
+    return validVideos
       .filter(v => v.isVertical === true)
       .slice(0, 12);
-  }, []);
+  }, [validVideos]);
 
   // Get featured channels with current video
   const featuredChannels = useMemo(() => {
     return FAST_CHANNELS.slice(0, 3).map(channel => ({
       channel,
-      nowPlaying: getChannelNowPlaying(channel, INITIAL_VIDEOS),
+      nowPlaying: getChannelNowPlaying(channel, validVideos),
     }));
-  }, []);
+  }, [validVideos]);
 
   // Get time-based greeting (hustle style)
   const greeting = useMemo(() => {
@@ -94,14 +98,17 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   // Hero carousel items - mix of courses and videos
-  const heroCarouselItems: HeroCarouselItem[] = useMemo(() => [
-    { type: 'course', item: COURSES[0] },
-    { type: 'video', item: INITIAL_VIDEOS[0] },
-    { type: 'course', item: COURSES[1] },
-    { type: 'video', item: INITIAL_VIDEOS[4] },
-    { type: 'course', item: COURSES[2] },
-    { type: 'video', item: INITIAL_VIDEOS[8] },
-  ], []);
+  const heroCarouselItems: HeroCarouselItem[] = useMemo(() => {
+    const longFormVideos = validVideos.filter(v => !v.isVertical && v.duration > 300);
+    return [
+      { type: 'course', item: COURSES[0] },
+      ...(longFormVideos[0] ? [{ type: 'video' as const, item: longFormVideos[0] }] : []),
+      { type: 'course', item: COURSES[1] },
+      ...(longFormVideos[4] ? [{ type: 'video' as const, item: longFormVideos[4] }] : []),
+      { type: 'course', item: COURSES[2] },
+      ...(longFormVideos[8] ? [{ type: 'video' as const, item: longFormVideos[8] }] : []),
+    ].filter(Boolean);
+  }, [validVideos]);
 
   return (
     <div className="min-h-screen bg-[#0D0D12]">

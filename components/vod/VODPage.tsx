@@ -6,6 +6,7 @@ import { VOD_CATEGORIES, INITIAL_VIDEOS, formatDuration } from '../../constants'
 import { useLibrary } from '../../contexts/LibraryContext';
 import { Video, HeroCarouselItem } from '../../types';
 import { HeroCarousel } from './HeroCarousel';
+import { filterValidVideos } from '../../services/videoValidationService';
 
 type ContentFormat = 'long' | 'short';
 
@@ -15,18 +16,21 @@ export const VODPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('featured');
   const [contentFormat, setContentFormat] = useState<ContentFormat>('long');
 
+  // Get all valid videos first
+  const validVideos = useMemo(() => filterValidVideos(INITIAL_VIDEOS), []);
+
   // Filter videos based on content format
   const formatFilteredVideos = useMemo(() => {
     if (contentFormat === 'short') {
-      return INITIAL_VIDEOS.filter(v => v.isVertical === true || v.duration <= 120);
+      return validVideos.filter(v => v.isVertical === true || v.duration <= 120);
     }
-    return INITIAL_VIDEOS.filter(v => !v.isVertical && v.duration > 120);
-  }, [contentFormat]);
+    return validVideos.filter(v => !v.isVertical && v.duration > 120);
+  }, [contentFormat, validVideos]);
 
   // Get shorts for the shorts section
   const shortsVideos = useMemo(() => {
-    return INITIAL_VIDEOS.filter(v => v.isVertical === true || v.duration <= 120);
-  }, []);
+    return validVideos.filter(v => v.isVertical === true || v.duration <= 120);
+  }, [validVideos]);
 
   // Helper to calculate progress percentage
   const getProgressPercent = (videoId: string, duration: number): number => {
@@ -49,11 +53,11 @@ export const VODPage: React.FC = () => {
       icon: cat.icon,
       count: cat.id === 'continue'
         ? continueWatching.length
-        : INITIAL_VIDEOS.filter(cat.filter).length,
+        : validVideos.filter(cat.filter).length,
     }));
-  }, [continueWatching.length]);
+  }, [continueWatching.length, validVideos]);
 
-  // Get videos for selected category (filtered by content format)
+  // Get videos for selected category (filtered by content format and validity)
   const getVideosForCategory = (categoryId: string): Video[] => {
     if (categoryId === 'continue') {
       return continueWatching
@@ -172,7 +176,7 @@ export const VODPage: React.FC = () => {
                       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                       {continueWatching.slice(0, 10).map(historyItem => {
-                        const video = INITIAL_VIDEOS.find(v => v.id === historyItem.videoId);
+                        const video = validVideos.find(v => v.id === historyItem.videoId);
                         if (!video) return null;
                         const progress = getProgressPercent(video.id, video.duration);
                         return (
@@ -222,7 +226,7 @@ export const VODPage: React.FC = () => {
                 {/* Most Popular Row */}
                 <ContentRowSection
                   title="Most Popular"
-                  videos={INITIAL_VIDEOS.slice(0, 10)}
+                  videos={validVideos.filter(v => !v.isVertical).slice(0, 10)}
                   onVideoClick={(v) => navigate(`/watch/${v.id}`)}
                   getProgressPercent={getProgressPercent}
                 />
@@ -230,7 +234,7 @@ export const VODPage: React.FC = () => {
                 {/* YC Content Row */}
                 <ContentRowSection
                   title="YC Startup School"
-                  videos={INITIAL_VIDEOS.filter(v => v.tags.includes('y-combinator')).slice(0, 10)}
+                  videos={validVideos.filter(v => v.tags.includes('y-combinator')).slice(0, 10)}
                   onVideoClick={(v) => navigate(`/watch/${v.id}`)}
                   getProgressPercent={getProgressPercent}
                 />
@@ -238,7 +242,7 @@ export const VODPage: React.FC = () => {
                 {/* Mindset Row */}
                 <ContentRowSection
                   title="Founder Mindset"
-                  videos={INITIAL_VIDEOS.filter(v => v.tags.includes('mindset') || v.tags.includes('inspiration')).slice(0, 10)}
+                  videos={validVideos.filter(v => v.tags.includes('mindset') || v.tags.includes('inspiration')).slice(0, 10)}
                   onVideoClick={(v) => navigate(`/watch/${v.id}`)}
                   getProgressPercent={getProgressPercent}
                 />
@@ -246,7 +250,7 @@ export const VODPage: React.FC = () => {
                 {/* Deep Dives Row */}
                 <ContentRowSection
                   title="Deep Dives"
-                  videos={INITIAL_VIDEOS.filter(v => v.duration >= 1800).slice(0, 10)}
+                  videos={validVideos.filter(v => v.duration >= 1800).slice(0, 10)}
                   onVideoClick={(v) => navigate(`/watch/${v.id}`)}
                   getProgressPercent={getProgressPercent}
                 />
