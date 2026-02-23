@@ -61,13 +61,13 @@ const Navigation: React.FC = () => {
     { path: '/games', label: 'Games', icon: Gamepad2 },
   ];
 
-  // Mobile bottom nav items (5 sections as requested)
+  // Mobile bottom nav items (5 sections)
   const mobileNavItems = [
     { path: '/', label: 'Home', icon: Home },
     { path: 'watch', label: 'Watch', icon: MonitorPlay, isWatch: true },
+    { path: '/feed', label: 'Shorts', icon: Clapperboard },
     { path: '/courses', label: 'Courses', icon: BookOpen, matchAlso: '/course' },
     { path: '/learn', label: 'Learn', icon: GraduationCap, matchAlso: '/learn' },
-    { path: '/games', label: 'Games', icon: Gamepad2 },
   ];
 
   return (
